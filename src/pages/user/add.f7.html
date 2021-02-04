@@ -1,0 +1,127 @@
+<template>
+    <div class="page" data-name="laporan-penjualan">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Tambah User Baru</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <form action="javascript: void(0)" id="formAddUser">
+                <div class="list no-hairlines-md">
+                    <ul class="row">
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Username</div>
+                                    <div class="item-input-wrap">
+                                        <input name="username" type="text" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Nama Lengkap</div>
+                                    <div class="item-input-wrap">
+                                        <input name="nama" type="text" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Level</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select name="level" placeholder="Please choose..." required>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Dapur">Dapur</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Status</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select name="status" placeholder="Please choose..." required>
+                                        <option value="Aktif">Aktif</option>
+                                        <option value="Tidak Aktif">Tidak Aktif</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Password</div>
+                                    <div class="item-input-wrap">
+                                        <input name="password" type="password" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-input-wrap">
+                                        <button type="submit" class="col button button-small button-fill">Simpan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+export default (props, { $, $store, $on, $f7, $f7router }) => {
+
+    $on('pageInit', () => {
+
+        $('#formAddUser').on('submit', function () {
+            var formData = $f7.form.convertToData('#formAddUser');
+
+            let users = $f7.store.state.users;
+            let cek = users.find(obj => {
+                return obj.username === formData.username;
+            })
+            if ( cek ) {
+                $f7.dialog.alert(`Maaf username "${formData.username}" sudah digunakan, silahkan masukan username lain`);
+            } else {
+                formData.id_user = (users.length+1).toString(); 
+                formData.registered = false; 
+                // store user
+                $store.dispatch('addUser', formData);
+
+                $f7.dialog.alert('Data User berhasil ditambahkan');
+                $f7router.back({force  : true});
+            }
+        });
+        
+    });
+
+    return $render;
+}
+</script>

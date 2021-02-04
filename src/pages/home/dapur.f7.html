@@ -1,0 +1,145 @@
+<template>
+    <div class="page" data-name="home">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link icon-only panel-open" data-panel="left">
+                <i class="icon material-icons if-md">menu</i>
+                </a>
+            </div>
+            <div class="title">Coffe's 90</div>
+            <div class="right">
+                <!-- <a href="/notifications/" class="link icon-only"> -->
+                <!-- <i class="icon material-icons if-md">notifications</i> -->
+                <!-- <img src="static/icons/notification.png" alt="" style="height: 22px;" /> -->
+                <!-- </a> -->
+                <a href="/logout/" class="link icon-only">
+                <!-- <i class="icon material-icons if-md">notifications</i> -->
+                <img src="static/icons/logout.jpg" alt="" style="height: 20px;" />
+                </a>
+            </div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <div class="block">
+                <!-- <div class="row">
+                    <a href="#" class="col button button-small button-fill margin-bottom">Update Data</a>
+                    <a href="#" class="col button button-small button-fill margin-bottom">Lapor Stok Data</a>
+                </div> -->
+                <div>
+                    <div class="block-title">Daftar Pesanan :</div>
+                    ${daftar_pesanan_dapur.map((item) => $h`
+                        <div class="card card-outline ambil-daftar-pesanan-dapur" data-id="${item.id_pesanan_detail}">
+                            <div class="card-content card-content-padding">
+                                <div>Meja no: ${item.nomor_meja}</div>
+                                <div>Nama Menu: ${item.menu.nama_menu}</div>
+                                <div>Jumlah: ${item.jumlah}</div>
+                                <div>Keterangan: ${item.keterangan}</div>
+                            </div>
+                        </div>
+                    `)}
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default (props,{ $f7, $on, $store, $f7route, $f7router, $update, $onMounted }) => {
+    const $ = $f7.$;
+    // let pesanan = $store.getters.pesanan;
+    // let pesanan_detail = $store.getters.pesanan_detail;
+    // let menu = $store.getters.menu;
+    
+    let getPesanan= function(id_pesanan){
+        let pesananRow = null;
+        $store.getters.pesanan.value.forEach((item) => {
+            if ( item.id_pesanan === id_pesanan ) {
+                pesananRow = item; 
+            }
+        });
+        return pesananRow;
+    };
+    let getPesananDetail= function(id_pesanan_detail){
+        let pesananDetailRow = null;
+        $store.getters.pesanan_detail.value.forEach((item) => {
+            if ( parseInt(item.id_pesanan_detail) === parseInt(id_pesanan_detail) ) {
+                // console.log(item)
+                pesananDetailRow = item; 
+            }
+        });
+        return pesananDetailRow;
+    };
+    let getMenu= function(id_menu){
+        let menuRow = null;
+        $store.getters.menu.value.forEach((item) => {
+            if ( parseInt(item.id_menu) === parseInt(id_menu) ) {
+                menuRow = item; 
+            }
+        });
+        return menuRow;
+    };
+    let daftar_pesanan_dapur = [];
+    $store.getters.pesanan_detail.value.forEach((item,index) => {
+        if ( item.status === 'Belum Siap' ) {
+            let daftar_pesanan_dapur_row = {};
+            daftar_pesanan_dapur_row.id_pesanan_detail = item.id_pesanan_detail;
+            daftar_pesanan_dapur_row.jumlah = item.jumlah;
+            daftar_pesanan_dapur_row.status = item.status;
+            daftar_pesanan_dapur_row.keterangan = item.keterangan;
+            daftar_pesanan_dapur_row.pesanan = getPesanan(item.id_pesanan);
+            daftar_pesanan_dapur_row.tanggal_pesanan = daftar_pesanan_dapur_row.pesanan.tanggal_pesanan;
+            daftar_pesanan_dapur_row.nomor_meja = daftar_pesanan_dapur_row.pesanan.nomor_meja;
+            daftar_pesanan_dapur_row.menu = getMenu(item.id_menu);
+            daftar_pesanan_dapur.push(daftar_pesanan_dapur_row);
+        }
+    });
+    console.log('daftar pesanan dapur',daftar_pesanan_dapur);
+
+    $on('pageInit', (e) => {
+        $('.ambil-daftar-pesanan-dapur').on('click',function(){
+            let id_pesanan_detail = $(this).data('id');
+            let data_detail = getPesananDetail(id_pesanan_detail);
+            data_detail.status = "Siap";
+            // console.log(getPesananDetail(id_pesanan_detail))
+            $store.dispatch('updatePesananDetail', data_detail)
+            daftar_pesanan_dapur = [];
+            $f7router.navigate('/home-dapur/',{reloadCurrent  : true});
+            // $f7router.back({force  : true});
+        })
+    })
+    // $on('pageBeforeIn', (e) => {
+    //     $('.ambil-daftar-pesanan-dapur').on('click',function(){
+    //         let id_pesanan_detail = $(this).data('id');
+    //         let data_detail = getPesananDetail(id_pesanan_detail);
+    //         data_detail.status = "Siap";
+    //         // console.log(getPesananDetail(id_pesanan_detail))
+    //         $store.dispatch('updatePesananDetail', data_detail)
+    //         console.log('cek',$store.getters.pesanan_detail.value)
+    //         $f7router.navigate('/home-dapur/');
+    //         // $f7router.back({force  : true});
+    //     })
+    // })
+    // $on('pageAfterIn', (e) => {
+    //     $('.ambil-daftar-pesanan-dapur').on('click',function(){
+    //         let id_pesanan_detail = $(this).data('id');
+    //         let data_detail = getPesananDetail(id_pesanan_detail);
+    //         data_detail.status = "Siap";
+    //         // console.log(getPesananDetail(id_pesanan_detail))
+    //         $store.dispatch('updatePesananDetail', data_detail)
+    //         console.log('cek',$store.getters.pesanan_detail.value)
+    //         $f7router.navigate('/home-dapur/');
+    //         // $f7router.back({force  : true});
+    //     })
+    // })
+    return $render;
+}
+</script>

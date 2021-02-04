@@ -1,0 +1,124 @@
+<template>
+    <div class="page" data-name="daftar-pesanan">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Daftar Pesanan</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <div class="block">
+                <div class="">
+                    <!-- <div class="block-title">Detail Pesanan :</div> -->
+                    ${daftar_antrian.map((item) => $h`
+                        <div class="card card-outline ambil-daftar-pesanan-admin" data-id="${item.id_pesanan}">
+                            <div class="card-content card-content-padding">
+                                <div>Nomor Meja: ${item.nomor_meja}</div>
+                                <div class="block-title no-margin-left">Detail Pesanan :</div>
+                                <div class="list no-hairlines-mdXX">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="float-left">Nama Menu</div>
+                                                    <div class="float-right">Status</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        ${item.pesanan_detail.map((i)=>$h`
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner">
+                                                        <div class="float-left">${i.menu.nama_menu}</div>
+                                                        <div class="float-right"><span class="${i.status=='Siap' ? 'text-color-green' : 'text-color-red'}">${i.status}</span></div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        `)}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `)}
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    // let pesanan = $store.getters.pesanan;
+    // let pesanan_detail = $store.getters.pesanan_detail;
+    // let menu = $store.getters.menu;
+    
+    let getPesananDetail= function(id_pesanan){
+        let pesananRow = [];
+        $store.getters.pesanan_detail.value.forEach((item) => {
+            // console.log(item)
+            if ( parseInt(item.id_pesanan) === parseInt(id_pesanan) ) {
+                item.menu = getMenu(item.id_menu);
+                pesananRow.push(item); 
+            }
+        });
+        return pesananRow;
+    };
+    let getMenu= function(id_menu){
+        let menuRow = null;
+        $store.getters.menu.value.forEach((item) => {
+            if ( parseInt(item.id_menu) === parseInt(id_menu) ) {
+                menuRow = item; 
+            }
+        });
+        return menuRow;
+    };
+
+    let daftar_antrian = [];
+    $store.getters.pesanan.value.forEach((item,index) => {
+        let pesanan_status = true; 
+        // item.pesanan_detail = ;
+        // if ( item.pesanan_detail.length > 0 ) {
+        getPesananDetail(item.id_pesanan).forEach((i) => {
+            pesanan_status = (i.status==='Selesai') ? true : false ;
+        });
+        // }
+        if ( !pesanan_status ) {
+            console.log(getPesananDetail(item.id_pesanan))
+            // item.pesanan_detail = getPesananDetail(item.id_pesanan);
+            item.pesanan_detail = getPesananDetail(item.id_pesanan);
+            daftar_antrian.push(item);
+        }
+        console.log(pesanan_status)
+    });
+    console.log('daftar pesanan',daftar_antrian);
+    
+    $on('pageInit', (e) => {
+        daftar_antrian = [];
+        $f7router.navigate('/daftar-antrian/',{reloadCurrent  : true});
+        $('.ambil-daftar-pesanan-admin').on('click',function(){
+            let id_pesanan = $(this).data('id');
+            let pesanan_detail = getPesananDetail(id_pesanan);
+            pesanan_detail.forEach((item)=>{
+                item.status = "Selesai";
+                $store.dispatch('updatePesananDetail', item)
+                // console.log(item)
+            })
+            $f7router.navigate('/daftar-antrian/',{reloadCurrent  : true});
+        })
+    })
+    return $render;
+}
+</script>

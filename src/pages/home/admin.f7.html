@@ -1,0 +1,270 @@
+<template>
+    <div class="page" data-name="home">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link icon-only panel-open" data-panel="left">
+                <i class="icon material-icons if-md">menu</i>
+                </a>
+            </div>
+            <div class="title">Coffe's 90</div>
+            <div class="right">
+                <a href="#" class="link icon-only panel-open" data-panel="right">
+                    <i class="icon material-icons">shopping_cart
+                    </i>
+                </a>
+                <!-- <a href="/notifications/" class="link icon-only"> -->
+                <!-- <i class="icon material-icons if-md">notifications</i> -->
+                <!-- <img src="static/icons/notification.png" alt="" style="height: 22px;" /> -->
+                <!-- </a> -->
+                <a href="/login/" class="link icon-only">
+                <!-- <i class="icon material-icons if-md">notifications</i> -->
+                <img src="static/icons/logout.jpg" alt="" style="height: 20px;" />
+                </a>
+            </div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <!-- <div class="block text-align-center">
+                <h2>Sistem Pemesanan Cafe</h2>
+                <img src="static/logo/logo-small.png" alt="" width="50%" />
+            </div> -->
+            ${daftar_menu.map((item) => $h`
+                <div class="block-title">${item.nama_kategori}</div>
+                <div class="list">
+                    <ul>
+                        ${item.menus.map((i) => $h`
+                            <li>
+                            <a data-id-menu="${i.id_menu}" data-menu="${i.nama_menu}" data-stok="${i.stok}" data-jenis-menu="${i.jenis_menu}" data-harga="${i.harga}" data-kategori="${item.nama_kategori}" class="item-link item-content tambah-pesanan" href="#" >
+                                <div class="item-media"><i class="icon icon-f7"></i></div>
+                                <div class="item-inner">
+                                    <div class="item-title">${i.nama_menu}</div>
+                                    <div class="item-after">Rp.${i.harga}</div>
+                                </div>
+                            </a>
+                            </li>
+                        ` )} 
+                    </ul>
+                </div>            
+            `)}
+            <div class="sheet-modal my-sheet">
+                <div class="toolbar">
+                    <div class="toolbar-inner">
+                        <div class="left"></div>
+                        <div class="right"><a class="link sheet-close" href="#">Done</a></div>
+                    </div>
+                </div>
+                <div class="sheet-modal-inner">
+                    <div class="block">
+                        <h4>Info</h4>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ac diam ac quam euismod porta vel a
+                        nunc. Quisque sodales scelerisque est, at porta justo cursus ac.</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</template>
+<script>
+export default (props,{ $on, $, $f7, $f7ready, $store, $f7route, $f7router, $update, $onMounted }) => {
+    // let obj = arr.find((o, i) => {
+    //     if (o.value === 'this') {
+    //         arr[i] = { name: 'new string', value: 'this', other: 'that' };
+    //         return true; // stop searching
+    //     }
+    // });
+
+    let kategori = $store.getters.kategori;
+    let menu = $store.getters.menu;
+
+    let daftar_menu = [];
+    kategori.value.forEach((item,index) => {
+        item.menus = [];
+        menu.value.forEach((itemMenu,indexMenu) => {
+            if ( itemMenu.id_kategori === item.id_kategori ) {
+                item.menus.push(itemMenu);
+            }
+        });
+        daftar_menu.push(item)
+    });
+
+    // let stepperCart;
+    let stepperAddCart;
+
+    $f7ready(() => {
+      // Dom Events
+      $('.panel-right').once('panel:open', function () {
+        console.log('Panel right ready: open');
+        $f7.stepper.get('.stepper-jumlah-cart')
+        .on('change',function(){
+            console.log('stepper change')
+            console.log(this.value)
+        })
+      });
+      $('.panel-right').on('panel:close', function () {
+        console.log('Panel right ready: close');
+      });
+    })
+
+    $on('pageInit', (e) => {
+
+        // Open dynamic sheet
+        $('.tambah-pesanan').on('click', function () {
+            let data = {
+                id_menu: $(this).data('id-menu'),
+                nama_menu: $(this).data('menu'),
+                harga: parseInt($(this).data('harga')),
+                kategori: $(this).data('kategori'),
+            };
+            let data_max = $(this).data('stok');
+            let data_jenis_menu = $(this).data('jenis-menu');
+
+            console.log('Data Max',data_max)
+
+            // Close inline sheet before
+            $f7.sheet.close('.my-sheet');
+
+            var dynamicSheet = $f7.sheet.create({
+                content: `
+                    <div class="sheet-modal">
+                        <div class="toolbar">
+                        <div class="toolbar-inner">
+                            <div class="left"><span class="padding-left">${data.nama_menu}</span></div>
+                            <div class="right">
+                            <span class="padding-right">Rp.${data.harga}</span>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="sheet-modal-inner">
+                            <div class="block" style="margin-top: -31px">
+                                <div class="list no-hairlines-mdXX">
+                                    <ul>
+                                        <li class="item-content item-input">
+                                            <div class="item-inner text-align-center">
+                                                <div class="item-input-wrap">
+                                                    <div class="stepper stepper-round stepper-init stepper-jumlah">
+                                                        <div class="stepper-button-minus"></div>
+                                                        <div class="stepper-input-wrap">
+                                                            <input type="text" value="1" min="1" max="100" step="1" readonly />
+                                                        </div>
+                                                        <div class="stepper-button-plus"></div>
+                                                    </div>          
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content item-input">
+                                            <div class="item-inner">
+                                                <div class="item-title item-label">Keterangan</div>
+                                                <div class="item-input-wrap">
+                                                    <textarea id="keteranganHome" rows="2" placeholder="keterangan (opsional)" style="height: auto !important"></textarea>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="item-content item-input">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <button id="tambahDetailPesanan" type="button" class="col button button-fill">Tambah Pesanan</button>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                `,
+
+                // Events
+                on: {
+                    open: function (sheet) {
+                        console.log('Sheet open');
+
+                        stepperAddCart = $f7.stepper.create({
+                            el: '.stepper-jumlah',
+                            on: {
+                                change: function () {
+                                    console.log('Stepper value changed')
+                                }
+                            }
+                        })
+                        stepperAddCart.min= 1;
+                        if ( data_jenis_menu === 'Stok' ) {
+                            stepperAddCart.max= data_max;
+                        }
+                        stepperAddCart.step= 1;
+                        stepperAddCart.value= 1;
+                        // console.log(stepperAddCart)
+
+                        $('#tambahDetailPesanan').on('click',function(){
+                            data['id'] = ($store.getters.cart.value.length+1);
+                            data['qty'] = parseInt(stepperAddCart.value);
+                            data['keterangan'] = $('#keteranganHome').val() ? $('#keteranganHome').val() : '-';
+                            if ( data_jenis_menu === 'Stok' ) {
+                                data['data_max']= data_max;
+                            } else {
+                                data['data_max']= 100;
+                            }
+                            $store.dispatch('addCart', data);
+                            stepperAddCart.destroy()
+                            dynamicSheet.close()
+                            // $f7.panel.open('.panel-right')
+                            // setTimeout(() => {
+                                // $f7.panel.close('.panel-right')
+                            // }, 1000);
+                            // dynamicSheet.destroy();
+                            // stepper.destroy();
+                            // $f7.stepper.destroy('.stepper-jumlah')
+                            
+                        })
+                    },
+                    opened: function (sheet) {
+                        console.log('Sheet opened');
+                    }
+                }
+            });
+      
+
+            // Events also can be assigned on instance later
+            dynamicSheet.on('close', function (sheet) {
+                console.log('Sheet close');
+                // dynamicSheet.destroy()
+            });
+            dynamicSheet.on('closed', function (sheet) {
+                console.log('Sheet closed');
+                $f7.panel.open('.panel-right')
+            });
+            // Open dynamic sheet
+            dynamicSheet.open();
+        });
+
+        // let panel = $f7.panel.get('.panel-right');
+        // console.log(panel)
+      // Create swipe-to-close Sheet
+    //   app.sheet.create({
+    //     el: '.my-sheet-swipe-to-close',
+    //     swipeToClose: true,
+    //     backdrop: true,
+    //   });
+    //   // Create swipe-to-step Sheet
+    //   app.sheet.create({
+    //     el: '.my-sheet-swipe-to-step',
+    //     swipeToClose: true,
+    //     swipeToStep: true,
+    //     backdrop: true,
+    //   });
+    })
+
+    return $render;
+}
+</script>

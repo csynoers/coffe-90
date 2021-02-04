@@ -1,0 +1,40 @@
+{
+  "cwd": "E:\\webserver\\cordova\\coffe-90-s",
+  "type": [
+    "cordova"
+  ],
+  "name": "Coffe 90 S",
+  "framework": "core",
+  "template": "split-view",
+  "bundler": "webpack",
+  "cssPreProcessor": false,
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkTheme": false,
+    "iconFonts": true,
+    "fillBars": false
+  },
+  "customBuild": false,
+  "webpack": {
+    "developmentSourceMap": true,
+    "productionSourceMap": true,
+    "hashAssets": false,
+    "preserveAssetsPaths": false,
+    "inlineAssets": true
+  },
+  "pkg": "com.coffe90s.m",
+  "cordova": {
+    "folder": "cordova",
+    "platforms": [
+      "android"
+    ],
+    "plugins": [
+      "cordova-plugin-statusbar",
+      "cordova-plugin-keyboard",
+      "cordova-plugin-splashscreen",
+      "cordova-plugin-inappbrowser",
+      "cordova-plugin-file"
+    ]
+  }
+}

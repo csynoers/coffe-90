@@ -1,0 +1,73 @@
+<template>
+    <div class="page" data-name="laporan-penjualan">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Informasi Users</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <div class="block">
+                <a href="/user-add/" class="col button button-small button-fill margin-bottom"><!-- <i class="f7-icons">plus_app</i> --> Tambah User Baru</a>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="label-cell">Username</th>
+                                <th class="label-cell">Password</th>
+                                <th class="label-cell">Nama Lengkap</th>
+                                <th class="label-cell">Level</th>
+                                <th class="label-cell">Status</th>
+                                <th class="label-cell">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listUsers">
+
+                            ${users.value.map((item) => $h`
+                                <tr>
+                                    <td class="label-cell">${item.username}</td>
+                                    <td class="label-cell">${item.password}</td>
+                                    <td class="label-cell">${item.nama}</td>
+                                    <td class="label-cell">${item.level}</td>
+                                    <td class="label-cell"><span class="${item.status=='Aktif' ? 'text-color-green' : 'text-color-red'}">${item.status}</span></td>
+                                    <td class="label-cell">
+                                        <a href="/user-edit/${item.id_user}" class="button button-small button-fill button-round">Edit</a>
+                                    </td>
+                                </tr>
+                            `)}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<style>
+    table tbody tr td {
+        padding: 3px 10px;
+        width: 1px;
+        white-space: nowrap;
+    }
+
+</style>
+<script>
+export default (props, { $store, $on }) => {
+    const users = $store.getters.users;
+
+    return $render;
+}
+</script>

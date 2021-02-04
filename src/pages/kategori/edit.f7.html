@@ -1,0 +1,84 @@
+<template>
+    <div class="page" data-name="laporan-penjualan">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Edit Data Kategori</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <form action="javascript: void(0)" id="formEditKategori">
+                <div class="list no-hairlines-md">
+                    <ul class="row">
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Nama Kategori</div>
+                                    <div class="item-input-wrap">
+                                        <input name="nama_kategori" type="text" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-input-wrap">
+                                        <input type="hidden" name="id_kategori" />
+                                        <button type="submit" class="col button button-small button-fill">Simpan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+export default (props, { $, $store, $on, $f7, $f7route, $f7router }) => {
+    $on('pageInit', () => {
+        let get = $f7route.params;
+        let kategori = $store.getters.kategori;
+        
+        let row = kategori.value.find(obj => {
+            return obj.id_kategori === get.kategoriId; 
+        })
+
+        console.log(kategori)
+
+        let formData = {
+            'nama_kategori': row.nama_kategori,
+            'id_kategori': row.id_kategori,
+        }
+        $f7.form.fillFromData('#formEditKategori', formData);
+
+        $('#formEditKategori').on('submit', function () {
+            let formData = $f7.form.convertToData('#formEditKategori');
+            // update kategori
+            $store.dispatch('updateKategori', formData);
+
+            $f7.dialog.alert('Data Kategori berhasil diubah');
+            $f7router.back({force  : true});
+        });
+
+    });
+
+    return $render;
+}
+</script>

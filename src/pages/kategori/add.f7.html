@@ -1,0 +1,80 @@
+<template>
+    <div class="page" data-name="laporan-penjualan">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Tambah Kategori Baru</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <form action="javascript: void(0)" id="formAddKategori">
+                <div class="list no-hairlines-md">
+                    <ul class="row">
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Nama Kategori</div>
+                                    <div class="item-input-wrap">
+                                        <input name="nama_kategori" type="text" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-input-wrap">
+                                        <button type="submit" class="col button button-small button-fill">Simpan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+export default (props, { $, $store, $on, $f7, $f7router }) => {
+
+$on('pageInit', () => {
+
+    $('#formAddKategori').on('submit', function () {
+        var formData = $f7.form.convertToData('#formAddKategori');
+
+        let kategori= $f7.store.state.kategori;
+        let cek = kategori.find(obj => {
+            return obj.nama_kategori === formData.nama_kategori;
+        })
+        if ( cek ) {
+            $f7.dialog.alert(`Maaf kategori menu "${formData.nama_kategori}" sudah digunakan, silahkan masukan kategori yang berbeda`);
+        } else {
+            formData.id_kategori = (kategori.length+1).toString(); 
+            // store kategori
+            $store.dispatch('addKategori', formData);
+
+            $f7.dialog.alert('Data Kategori baru berhasil ditambahkan');
+            $f7router.back({force  : true});
+        }
+    });
+    
+});
+
+return $render;
+}
+</script>

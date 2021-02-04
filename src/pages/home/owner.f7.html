@@ -1,0 +1,95 @@
+<template>
+    <div class="page" data-name="home">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link icon-only panel-open" data-panel="left">
+                <i class="icon material-icons if-md">menu</i>
+                </a>
+            </div>
+            <div class="title">Coffe's 90</div>
+            <div class="right">
+                <a href="/notifications/" class="link icon-only">
+                <!-- <i class="icon material-icons if-md">notifications</i> -->
+                <img src="static/icons/notification.png" alt="" style="height: 22px;" />
+                </a>
+                <!-- <a href="/logout/" class="link icon-only"> -->
+                <!-- <i class="icon material-icons if-md">notifications</i> -->
+                <!-- <img src="static/icons/logout.jpg" alt="" style="height: 20px;" /> -->
+                <!-- </a> -->
+            </div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <div class="block">
+                <div class="block-title">Menu Favorit</div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="numeric-cell">No</th>
+                                <th class="label-cell">Nama Menu</th>
+                                <th class="label-cell">Terjual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${menu_favorit.map((Mitem,Mindex)=>$h`
+                                <tr>
+                                    <td class="numeric-cell">${Mindex+1}</td>
+                                    <td class="label-cell">${Mitem.nama_menu}</td>
+                                    <td class="label-cell">${Mitem.terjual}</td>
+                                </tr>
+                            `)}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="block block-strong">
+                <div class="row">
+                    <div class="col-50 text-align-center">
+                        <img src="static/icons/laporan.png" alt="" style="width: 50%;" />
+                        <h4 class="no-margin">Laporan Penjualan</h4>
+                        <a href="/laporan-penjualan/" class="button button-small button-round button-outline margin-horizontal">Proses</a>
+                    </div>
+                    <div class="col-50 text-align-center">
+                        <img src="static/icons/laporan.png" alt="" style="width: 50%;" />
+                        <h4 class="no-margin">Laporan Stok</h4>
+                        <a href="/laporan-stok/" class="button button-small button-round button-outline margin-horizontal">Proses</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default (props,{ $f7, $store, $f7route, $f7router, $update, $onMounted }) => {
+    let menu = $store.getters.menu;
+    
+    let getTerjual = function(id_menu){
+        let terjualArray = 0;
+        $store.getters.pesanan_detail.value.forEach((item) => {
+            if ( item.id_menu == id_menu ) {
+                terjualArray = terjualArray+item.jumlah;
+            }
+        });
+        return terjualArray;
+    }
+
+    let menu_favorit = [];
+    menu.value.forEach((item,index) => {
+        menu_favorit.push(item);
+        menu_favorit[index].terjual = getTerjual(item.id_menu);
+    });
+    menu_favorit.sort((a, b) => (a.terjual < b.terjual) ? 1 : -1)
+    return $render;
+}
+</script>

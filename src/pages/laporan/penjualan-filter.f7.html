@@ -1,0 +1,138 @@
+<template>
+    <div class="page" data-name="laporan-penjualan">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Penjualan Periode ${$f7route.query.start} s.d ${$f7route.query.end}</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <div class="block">
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="numeric-cell">No</th>
+                                <th class="label-cell">Tanggal</th>
+                                <th class="label-cell">Nama Menu</th>
+                                <th class="numeric-cell">Jumlah</th>
+                                <th class="numeric-cell">Harga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${daftar_pesanan.map((Mitem,Mindex)=>$h`
+                                <tr>
+                                    <td class="numeric-cell">${Mindex+1}</td>
+                                    <td class="label-cell">${getTanggalPesanan(Mitem.id_pesanan).tanggal_pesanan}</td>
+                                    <td class="label-cell">${getNamaMenu(Mitem.id_menu).nama_menu}</td>
+                                    <td class="numeric-cell">${Mitem.jumlah}</td>
+                                    <td class="numeric-cell">${Mitem.harga}</td>
+                                </tr>
+                            `)}
+                        </tbody>
+                    </table>
+                </div>
+                <button id="exportPdfPenjualanFilter" class="button button-small button-round button-outline margin-top">Export PDF</button>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default (props,{ $, $f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    let pesanan = $store.getters.pesanan;
+    let menu = $store.getters.menu;
+    let pesanan_detail = $store.getters.pesanan_detail;
+
+    let toTimestamp = function (strDate){
+        var datum = Date.parse(strDate);
+        return datum/1000;
+    }
+    
+    let getTanggalPesanan = function(id_pesanan){
+        return pesanan.value.find(o => parseInt(o.id_pesanan) === parseInt(id_pesanan));
+    }
+    let getNamaMenu = function(id_menu){
+        return menu.value.find(o => parseInt(o.id_menu) === parseInt(id_menu));
+    }
+    
+    let daftar_pesanan = [];
+    pesanan_detail.value.forEach((item)=> {
+        if ( item.status === 'Selesai' ) {
+            let tanggal_pesanan = toTimestamp(getTanggalPesanan(item.id_pesanan).tanggal_pesanan);
+            // console.log(getTanggalPesanan(item.id_pesanan))
+            if ( tanggal_pesanan > toTimestamp($f7route.query.start) && tanggal_pesanan < toTimestamp($f7route.query.end) ) {
+                daftar_pesanan.push(item)
+            }
+            // daftar_pesanan.push(item)
+        }
+    });
+
+    $on('pageInit', (e) => {
+        $('#exportPdfPenjualanFilter').on('click',function(){
+            var generateData = function() {
+                var result = [];
+                daftar_pesanan.forEach((item,index)=>{
+                    result.push(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${getTanggalPesanan(item.id_pesanan).tanggal_pesanan}</td>
+                            <td>${getNamaMenu(item.id_menu).nama_menu}</td>
+                            <td>${item.jumlah}</td>
+                            <td>${item.harga}</td>
+                        </tr>
+                    `);
+                })
+                return result.join('');
+            };
+
+            function createHeaders(thead) {
+                var result = [];
+                thead.forEach((item) => {
+                    result.push(`<th>${item}</th>`)
+                });
+                return `<tr>${result.join('')}</tr>`;
+            }
+
+            var headers = createHeaders([
+                "No",
+                "Tanggal",
+                "Nama Menu",
+                "Jumlah",
+                "Harga"
+            ]);
+            document.addEventListener('deviceready', function () {
+            
+                cordova.plugins.pdf.htmlToPDF({
+                    data: `<html>
+                        <h1>  Laporan Penjualan Periode ${$f7route.query.start} s.d ${$f7route.query.end}  </h1>
+                        <table style="width:100%" border="1">
+                            ${headers}
+                            ${generateData()}
+                        </table>
+                    </html>`,
+                    documentSize: 'A4',
+                    landscape: 'portrait',
+                    type: 'share' //use share to open the open-with-menu.
+                }, this.success, this.failure);
+
+            }, false);
+        })
+    })
+    return $render;
+}
+</script>

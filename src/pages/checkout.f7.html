@@ -1,0 +1,279 @@
+<template>
+    <div class="page" data-name="add-checkout">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Checkout</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <div class="block">
+                <div class="list no-hairlines-md">
+                    <ul class="row">
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">No Meja</div>
+                                    <div class="item-input-wrap">
+                                        <input id="checkoutNoMeja" type="number" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label" style="">Jumlah Bayar <small id="checkoutBayarAlert" class="text-color-deeporange float-right" style="display: none;">-Rp.5000</small></div>
+                                    <div class="item-input-wrap">
+                                        <input id="checkoutBayar" type="number" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="">
+                    <div class="block-title">Detail Pesanan :</div>
+                    ${cart.value.map((item) => $h`
+                        <div class="card card-outline">
+                            <div class="card-content card-content-padding">
+                                <div>${item.nama_menu}</div>
+                                <div><small>Kategori: ${item.kategori}</small></div>
+                                <div><span class="text-color-deeporange">Rp.${item.harga}</span></div>
+                                <div class="no-margin">Jumlah: ${item.qty}</div>
+                            </div>
+                        </div>
+                    `)}
+                </div>
+                <div class="list no-hairlines-md text-align-right">
+                    <ul>
+                        <li>
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Subtotal</div>
+                                    <div class="item-input-wrap">
+                                        <input class="text-align-right" type="text" value="Rp.${subtotal}" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Bayar</div>
+                                    <div class="item-input-wrap">
+                                        <input id="checkoutBayarSecond" class="text-align-right" type="text" value="Rp.${bayar}" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Kembalian</div>
+                                    <div class="item-input-wrap">
+                                        <input id="checkoutKembalian" class="text-align-right" type="text" value="Rp.${kembalian}" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <button id="checkoutProses" class="button button-small button-round button-outline margin-top">Proses</button>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    let cart = $store.getters.cart;
+
+
+    
+    let getSubtotal = function(){
+        let subtotal_mod = 0;
+        cart.value.forEach((item)=>{
+            subtotal_mod += item.qty*item.harga;
+        })
+        return subtotal_mod;
+    }
+    let subtotal = getSubtotal();
+    // let subtotal = cart.value.reduce(function(previousValue, currentValue) {
+    //     return (previousValue.qty*previousValue.harga)+(currentValue.qty*currentValue.harga)
+    // });
+
+
+    if ( typeof subtotal === 'object' && subtotal !== null ) {
+        subtotal = subtotal.qty*subtotal.harga;
+    }
+
+    let bayar = 0;
+    let kembalian = 0;
+
+    let getNamaMenu = function(id_menu){
+        return $store.getters.menu.value.find(o => parseInt(o.id_menu) === parseInt(id_menu));
+    }
+    // console.log(subtotal)
+    // console.log(cart.value)
+
+    $on('pageInit', (e) => {
+        $('#checkoutBayar').on('keyup change',function(){
+            bayar = $(this).val();
+            kembalian = bayar-subtotal;
+
+            // push to input kembalian
+            $('#checkoutBayarSecond').val(`Rp.${bayar}`);
+
+            // push to input kembalian
+            let kembalianText = kembalian > 0 ? `Rp.${kembalian}` : `-Rp.${(kembalian*-1)}` ;
+            $('#checkoutKembalian').val(kembalianText);
+            if ( kembalian < 0  ) {
+                $('#checkoutBayarAlert').text(kembalianText).css('display','block');
+            } else {
+                $('#checkoutBayarAlert').css('display','none');
+            }
+        })
+
+        $('#checkoutProses').on('click',function(){
+            let sel= {
+                meja: $('#checkoutNoMeja'),
+                bayar: $('#checkoutBayar'),
+            };
+            if ( !sel.meja.val() ) {
+                sel.meja.focus();
+            }
+            if ( sel.meja.val() && !sel.bayar.val() ) {
+                sel.bayar.focus();
+            }
+
+            if ( sel.meja.val() && sel.bayar.val() ) {
+                if ( kembalian > 0 ) {
+                    let tanggal_pesanan = function () {
+                        // var timestamp = 1293683278;
+                        var date = new Date();
+
+                        var year = date.getFullYear();
+                        var month = date.getMonth() + 1;
+                        var day = date.getDate();
+                        var hours = date.getHours();
+                        var minutes = date.getMinutes();
+                        var seconds = date.getSeconds();
+
+                        return (year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds);
+                    }
+
+                    let pesanan = $store.getters.pesanan;
+                    let id_pesanan = (pesanan.value.length+1);
+                    let data = {
+                        id_pesanan: id_pesanan,
+                        id_user: 2,
+                        nomor_meja: sel.meja.val(),
+                        tanggal_pesanan: tanggal_pesanan()
+                    };
+
+                    $store.dispatch('addPesanan', data)
+                    cart.value.forEach((detail) => {
+                        let id_pesanan_detail = $store.getters.pesanan_detail.value.length+1;
+                        let data_detail = {
+                            id_pesanan_detail: id_pesanan_detail,
+                            id_pesanan: id_pesanan,
+                            id_menu: detail.id_menu,
+                            harga: detail.harga,
+                            jumlah: detail.qty,
+                            keterangan: detail.keterangan,
+                            status: "Belum Siap"
+                        };
+                        console.log(id_pesanan)
+                        $store.dispatch('addPesananDetail', data_detail)
+
+                        // update menu
+                        $store.getters.menu.value.forEach((item,index) => {
+                            if ( parseInt(item.id_menu) === parseInt(detail.id_menu) ) {
+                                item.stok = item.stok-detail.qty;
+                            }
+                        });
+                    });
+                    $store.dispatch('setCartEmpty')
+                    document.addEventListener('deviceready', function () {
+                        var generateData = function() {
+                            var result = [];
+                            $store.getters.pesanan_detail.value.forEach((item,index)=>{
+                                if ( parseInt(item.id_pesanan) === parseInt(id_pesanan) ) {
+                                    result.push(`
+                                        <div style="width: 100%; display: flex;">
+                                            <p style="width: 50%;">${item.jumlah} | ${getNamaMenu(item.id_menu).nama_menu}</p>
+                                            <p style="width: 50%; text-align: right;">Rp.${item.harga*item.jumlah}</p>
+                                        </div>
+                                    `);
+                                }
+                                
+                            })
+                            return result.join('');
+                        };
+
+                        cordova.plugins.pdf.htmlToPDF({
+                        // console.log({
+                            data: `<html>
+                                <div style="padding: 15px;">
+                                    <h4 style="text-align: center;">Coffe's 90</h4>
+                                    <div style="border-bottom: dashed;"></div>
+                                    <div style="width: 100%; display: flex;">
+                                        <p style="width: 50%;">Tanggal : ${data.tanggal_pesanan}</p>
+                                        <p style="width: 50%; text-align: right;">No Meja : ${data.nomor_meja}</p>
+                                    </div>
+                                    <div style="border-bottom: dashed;"></div>
+                                    <div style="width: 100%; display: flex;">
+                                        <p style="width: 50%;">Qty | Menu</p>
+                                        <p style="width: 50%; text-align: right;">Subtotal</p>
+                                    </div>
+                                    <div style="border-bottom: dashed;"></div>
+                                    ${generateData()}
+                                    <div style="border-bottom: dashed;"></div>
+                                    <div style="width: 100%; display: flex;">
+                                        <p style="width: 50%; margin: 1px 0px;">Total</p>
+                                        <p style="width: 50%; margin: 1px 0px; text-align: right;">Rp.${subtotal}</p>
+                                    </div>
+                                    <div style="width: 100%; display: flex;">
+                                        <p style="width: 50%; margin: 1px 0px;">Bayar</p>
+                                        <p style="width: 50%; margin: 1px 0px; text-align: right;">Rp.${bayar}</p>
+                                    </div>
+                                    <div style="width: 100%; display: flex;">
+                                        <p style="width: 50%; margin: 1px 0px;">Kembalian</p>
+                                        <p style="width: 50%; margin: 1px 0px; text-align: right;">Rp.${kembalian}</p>
+                                    </div>
+                                    <h5 style="text-align: center;">-- Terimakasih atas kunjungannya --</h5>
+                                </div>
+                            </html>`,
+                            documentSize: 'C7',
+                            landscape: 'portrait',
+                            type: 'share' //use share to open the open-with-menu.
+                        }, this.success, this.failure);
+
+                    }, false);
+                    $f7router.back('/home-admin/',{force  : true});
+                    // $f7router.previousRoute ='/home-admin/';
+                }
+            }
+            
+        })
+    })
+    
+
+    return $render;
+}
+</script>

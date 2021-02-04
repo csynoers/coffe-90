@@ -1,0 +1,162 @@
+<template>
+    <div class="page" data-name="add-menu">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Tambah Menu Baru</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <form action="javascript: void(0)" id="formAddMenu">
+                <div class="list no-hairlines-md">
+                    <ul class="row">
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Nama Menu</div>
+                                    <div class="item-input-wrap">
+                                        <input name="nama_menu" type="text" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Kategori</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select name="id_kategori" placeholder="Please choose..." required>
+                                            <option value="" selected disabled > -- Pilih Kategori Menu -- </option>
+                                            ${kategori.value.map((item) => $h`
+                                                <option value="${item.id_kategori}">${item.nama_kategori}</option>
+                                            `)} 
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Jenis Menu</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select id="jenisMenuAddMenu" name="jenis_menu" placeholder="Please choose..." required>
+                                            <option value="Stok">Stok</option>
+                                            <option value="Non Stok">Non Stok</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100" id="stokAddMenuWrapper">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Stok</div>
+                                    <div class="item-input-wrap">
+                                        <input id="stokAddMenu" name="stok" type="text" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100" id="statusNonStokAddMenuWrapper">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Status Non Stok</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select id="statusNonStokAddMenu" name="status_nonstok" placeholder="Please choose..." required>
+                                            <option value="Tersedia">Tersedia</option>
+                                            <option value="Tidak Tersedia">Tidak Tersedia</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Harga</div>
+                                    <div class="item-input-wrap">
+                                        <input name="harga" type="number" required/>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Status Menu</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select name="status_menu" placeholder="Please choose..." required>
+                                            <option value="Aktif">Aktif</option>
+                                            <option value="Tidak Aktif">Tidak Aktif</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-input-wrap">
+                                        <button type="submit" class="col button button-small button-fill">Simpan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+export default (props,{$, $f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    const kategori = $store.getters.kategori;
+
+    $on('pageInit', (e, page) => {
+        console.log('pageInit', page);
+        $('#statusNonStokAddMenuWrapper').css("display","none");
+        $('#jenisMenuAddMenu').on('change',function(){
+            if ( $(this).val() === 'Stok' ) {
+                $('#stokAddMenu').prop('required',true);
+                $('#stokAddMenuWrapper').css("display","block");
+                $('#statusNonStokAddMenu').prop('required',false);
+                $('#statusNonStokAddMenuWrapper').css("display","none");
+            } else {
+                $('#stokAddMenu').prop('required',false);
+                $('#stokAddMenuWrapper').css("display","none");
+                $('#statusNonStokAddMenu').prop('required',true);
+                $('#statusNonStokAddMenuWrapper').css("display","block");
+            }
+        })
+
+        $('#formAddMenu').on('submit',function(){
+            var formData = $f7.form.convertToData('#formAddMenu');
+            let menu = $f7.store.state.menu;
+
+            formData.id_menu = (menu.length+1).toString(); 
+            // store menu
+            $store.dispatch('addMenu', formData);
+
+            $f7.dialog.alert('Data Menu berhasil ditambahkan');
+            $f7router.back({force  : true});
+        })
+    });
+
+    return $render;
+}
+</script>

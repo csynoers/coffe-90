@@ -1,0 +1,138 @@
+<template>
+    <div class="page" data-name="laporan-penjualan">
+        <!-- Top Navbar -->
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+            <div class="title">Edit Informasi User</div>
+            </div>
+        </div>
+        <!-- Toolbar-->
+        <div class="toolbar toolbar-bottom">
+            <div class="text-align-center">
+                <p>@coffe's 90</p>
+            </div>
+        </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <form action="javascript: void(0)" id="formEditUser">
+
+                <div class="list no-hairlines-md">
+                    <ul class="row">
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Username</div>
+                                    <div class="item-input-wrap">
+                                        <input name="username" type="text" readonly style="background-color: #eeeeee;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Nama Lengkap</div>
+                                    <div class="item-input-wrap">
+                                        <input name="nama" type="text" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Level</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select name="level" placeholder="Please choose...">
+                                        <option value="Admin">Admin</option>
+                                        <option value="Dapur">Dapur</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Status</div>
+                                    <div class="item-input-wrap input-dropdown-wrap">
+                                        <select name="status" placeholder="Please choose...">
+                                        <option value="Aktif">Aktif</option>
+                                        <option value="Tidak Aktif">Tidak Aktif</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col-100">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-title item-label">Password</div>
+                                    <div class="item-input-wrap">
+                                        <input name="password" type="password" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="col">
+                            <div class="item-content item-input">
+                                <div class="item-inner">
+                                    <div class="item-input-wrap">
+                                        <input type="hidden" name="id_user" />
+                                        <input type="hidden" name="registered" />
+                                        <button type="submit" class="col button button-small button-fill">Simpan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+export default (props, { $, $store, $on, $f7, $f7route, $f7router }) => {
+    $on('pageInit', () => {
+        let get = $f7route.params;
+        let users = $store.getters.users;
+        
+        let row = users.value.find(obj => {
+            return obj.id_user === get.userId; 
+        })
+
+        console.log(users)
+
+        let formData = {
+            'username': row.username,
+            'nama': row.nama,
+            'level': row.level,
+            'status': row.status,
+            'password': row.password,
+            'id_user': row.id_user,
+            'registered': row.registered,
+        }
+        $f7.form.fillFromData('#formEditUser', formData);
+
+        $('#formEditUser').on('submit', function () {
+            let formData = $f7.form.convertToData('#formEditUser');
+            // update user
+            $store.dispatch('updateUser', formData);
+
+            $f7.dialog.alert('Data User berhasil diubah');
+            $f7router.back({force  : true});
+        });
+
+    });
+
+    return $render;
+}
+
+</script>
