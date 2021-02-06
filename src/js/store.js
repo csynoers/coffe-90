@@ -4,6 +4,7 @@ import { createStore } from 'framework7';
 const store = createStore({
   state: {
     // url: 'http://localhost:8081/',
+    level: 0,
     url: 'https://restapp.site.co.id',
     products: [
       {
@@ -72,6 +73,9 @@ const store = createStore({
     kategori: [],
     menu: [],
     daftar_menu: [],
+    menu_belum_siap: [],
+    menu_siap: [],
+    daftar_antrian: [],
     cart: [
       // {
       //   id: 1,
@@ -125,6 +129,9 @@ const store = createStore({
     url({ state }) {
       return state.url;
     },
+    level({ state }) {
+      return state.level;
+    },
     products({ state }) {
       return state.products;
     },
@@ -139,6 +146,15 @@ const store = createStore({
     },
     daftar_menu({ state }) {
       return state.daftar_menu;
+    },
+    menu_siap({ state }) {
+      return state.menu_siap;
+    },
+    menu_belum_siap({ state }) {
+      return state.menu_belum_siap;
+    },
+    daftar_antrian({ state }) {
+      return state.daftar_antrian;
     },
     cart({ state }) {
       return state.cart;
@@ -183,6 +199,27 @@ const store = createStore({
           state.daftar_menu = daftar_menu;
         })
     },
+    getDaftarAntrian({ state }) {
+      fetch(`${state.url}/pesanan?status_pesanan=daftar_antrian`)
+        .then((res) => res.json())
+        .then((daftar_antrian) => {
+          state.daftar_antrian = daftar_antrian;
+        })
+    },
+    getMenuBelumSiap({ state }) {
+      fetch(`${state.url}/pesanan?status_pesanan=Belum Siap`)
+        .then((res) => res.json())
+        .then((menu_belum_siap) => {
+          state.menu_belum_siap = menu_belum_siap;
+        })
+    },
+    getMenuSiap({ state }) {
+      fetch(`${state.url}/pesanan?status_pesanan=Siap`)
+        .then((res) => res.json())
+        .then((menu_siap) => {
+          state.menu_siap = menu_siap;
+        })
+    },
     addProduct({ state }, product) {
       state.products = [...state.products, product];
     },
@@ -197,6 +234,9 @@ const store = createStore({
     },
     addCart({ state }, cart) {
       state.cart = [...state.cart, cart];
+    },
+    updateLevel({ state }, level) {
+      state.level = level;
     },
     setCartEmpty({ state }) {
       state.cart = [];

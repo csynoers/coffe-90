@@ -40,7 +40,7 @@
     </div>
 </template>
 <script>
-    export default (props,{ $f7, $f7route, $f7router, $update, $onMounted }) => {
+    export default (props,{ $f7, $store, $f7route, $f7router, $update, $onMounted }) => {
         const $ = $f7.$;
 
         // Login screen data
@@ -59,41 +59,44 @@
         $onMounted(() => {
             $('#formLogin').on('submit',function(e){
                 var formData = $f7.form.convertToData(this);
-                $f7router.navigate('/home-owner/')
+                // $f7router.navigate('/home-owner/')
 
-                // let users = $f7.store.state.users;
-                // users.forEach((item,index) => {
-                //     if ( item.username==formData.username && item.password==formData.password ) {
-                //         item.registered = true;
-                //         // console.log('true',item)
-                //     } else {
-                //         // console.log('false',item)
-                //     }
-                // });
-                // $f7.store.dispatch('updateUser', users)
+                let users = $f7.store.state.users;
+                users.forEach((item,index) => {
+                    if ( item.username==formData.username && item.password==formData.password ) {
+                        item.registered = true;
+                        // console.log('true',item)
+                    } else {
+                        // console.log('false',item)
+                    }
+                });
+                $f7.store.dispatch('updateUser', users)
 
-                // let countUser = $f7.store.getters.registeredUsers.value.length;
+                let countUser = $f7.store.getters.registeredUsers.value.length;
 
-                // if ( countUser > 0 ) {
-                //     let role = $f7.store.getters.registeredUsers.value[0].role;
-                //     switch (role) {
-                //         case 'owner':
-                //             $f7router.navigate('/home-owner/');
-                //             break;
-                //         case 'admin':
-                //             $f7router.navigate('/home-admin/');
-                //             break;
-                //         case 'karyawan':
-                //             $f7router.navigate('/home-karyawan/');
-                //             break;
+                if ( countUser > 0 ) {
+                    let role = $f7.store.getters.registeredUsers.value[0].level;
+                    switch (role) {
+                        case 'Owner':
+                            $store.dispatch('updateLevel','Owner');
+                            $f7router.navigate('/home-owner/');
+                            break;
+                        case 'Admin':
+                            $store.dispatch('updateLevel','Admin');
+                            $f7router.navigate('/home-admin/');
+                            break;
+                        case 'Dapur':
+                            $store.dispatch('updateLevel','Dapur');
+                            $f7router.navigate('/home-dapur/');
+                            break;
                             
-                //         default:
-                //             $f7router.navigate('/');
-                //             break;
-                //     }
-                // } else {
-                //     $f7.dialog.alert('Maaf user tidak ditemukan')
-                // }
+                        default:
+                            $f7router.navigate('/');
+                            break;
+                    }
+                } else {
+                    $f7.dialog.alert('Maaf user tidak ditemukan')
+                }
                 
             })
         });

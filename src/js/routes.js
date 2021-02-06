@@ -61,8 +61,12 @@ import NotFoundPage from '../pages/404.f7.html';
 var routes = [
   {
     path: '/',
-    component: HomeAdminPage,
+    component: LoginPage,
   },
+  // {
+  //   path: '/',
+  //   component: DaftarAntrianPage,
+  // },
   // {
   //   path: '/',
   //   component: LaporanStokPage,

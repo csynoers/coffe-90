@@ -27,7 +27,7 @@
                     ${daftar_antrian.value.map((item) => $h`
                         <div class="card card-outline ambil-daftar-pesanan-admin" data-id="${item.id_pesanan}">
                             <div class="card-content card-content-padding">
-                                <div>Nomor Meja: ${item.nomor_meja}</div>
+                                <div>Nomor Meja: nomor_meja</div>
                                 <div class="block-title no-margin-left">Detail Pesanan :</div>
                                 <div class="list no-hairlines-mdXX">
                                     <ul>
@@ -43,8 +43,8 @@
                                             <li>
                                                 <div class="item-content">
                                                     <div class="item-inner">
-                                                        <div class="float-left">${i.nama_menu}</div>
-                                                        <div class="float-right"><span class="${i.status_pesanan_detail=='Siap' ? 'text-color-green' : 'text-color-red'}">${i.status_pesanan_detail}</span></div>
+                                                        <div class="float-left">${i.menu.nama_menu}</div>
+                                                        <div class="float-right"><span class="${i.status=='Siap' ? 'text-color-green' : 'text-color-red'}">${i.status}</span></div>
                                                     </div>
                                                 </div>
                                             </li>
@@ -68,8 +68,7 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
         $store.dispatch('getDaftarAntrian');
 
         console.log(daftar_antrian)
-    });
-
+    })
     return $render;
 }
 </script>
