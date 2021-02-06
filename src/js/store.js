@@ -3,7 +3,8 @@ import { createStore } from 'framework7';
 
 const store = createStore({
   state: {
-    url: 'http://localhost:8081/',
+    // url: 'http://localhost:8081/',
+    url: 'https://restapp.site.co.id',
     products: [
       {
         id: '1',

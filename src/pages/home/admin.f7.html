@@ -168,24 +168,23 @@ export default (props,{ $on, $, $f7, $f7ready, $store, $f7route, $f7router, $upd
                         let qty = parseInt(stepperAddCart.value);
                         let keterangan = $('#keteranganHome').val() ? $('#keteranganHome').val() : '-';
 
-                        // add to cart
-                        $store.dispatch('addCart', {
+                        let data_add_cart = {
                             id_menu: i.id_menu,
                             nama_menu: i.nama_menu,
                             kategori: i.nama_kategori,
                             keterangan: keterangan,
                             harga: i.harga,
-                            qty: qty
-                        });
+                            qty: qty,
+                        };
+
+                        if ( i.jenis_menu == 'Stok' ) {
+                            data_add_cart.qty_max = i.stok;
+                        }
+                        
+                        $store.dispatch('addCart', data_add_cart);
+
                         stepperAddCart.destroy()
                         dynamicSheet.close()
-                        // $f7.panel.open('.panel-right')
-                        // setTimeout(() => {
-                            // $f7.panel.close('.panel-right')
-                        // }, 1000);
-                        // dynamicSheet.destroy();
-                        // stepper.destroy();
-                        // $f7.stepper.destroy('.stepper-jumlah')
                         
                     })
                 },

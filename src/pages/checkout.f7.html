@@ -103,6 +103,7 @@
 export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
     let cart = $store.getters.cart;
 
+    console.log(cart)
 
     
     let getSubtotal = function(){
@@ -113,10 +114,6 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
         return subtotal_mod;
     }
     let subtotal = getSubtotal();
-    // let subtotal = cart.value.reduce(function(previousValue, currentValue) {
-    //     return (previousValue.qty*previousValue.harga)+(currentValue.qty*currentValue.harga)
-    // });
-
 
     if ( typeof subtotal === 'object' && subtotal !== null ) {
         subtotal = subtotal.qty*subtotal.harga;
@@ -177,37 +174,36 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
                         return (year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds);
                     }
 
-                    let pesanan = $store.getters.pesanan;
-                    let id_pesanan = (pesanan.value.length+1);
                     let data = {
-                        id_pesanan: id_pesanan,
                         id_user: 2,
                         nomor_meja: sel.meja.val(),
                         tanggal_pesanan: tanggal_pesanan()
                     };
 
-                    $store.dispatch('addPesanan', data)
+                    let pembayaran = {
+                        tanggal_bayar: tanggal_pesanan(),
+                        jumlah_bayar: sel.bayar
+                    };
+
+                    let detail_pesanan = [];
+                    
                     cart.value.forEach((detail) => {
-                        let id_pesanan_detail = $store.getters.pesanan_detail.value.length+1;
                         let data_detail = {
-                            id_pesanan_detail: id_pesanan_detail,
-                            id_pesanan: id_pesanan,
                             id_menu: detail.id_menu,
                             harga: detail.harga,
                             jumlah: detail.qty,
                             keterangan: detail.keterangan,
-                            status: "Belum Siap"
+                            status_pesanan_detail: "Belum Siap"
                         };
-                        console.log(id_pesanan)
-                        $store.dispatch('addPesananDetail', data_detail)
-
-                        // update menu
-                        $store.getters.menu.value.forEach((item,index) => {
-                            if ( parseInt(item.id_menu) === parseInt(detail.id_menu) ) {
-                                item.stok = item.stok-detail.qty;
-                            }
-                        });
+                        detail_pesanan.push(data_detail);
                     });
+                    
+                    console.log({
+                        'pesanan' : data,
+                        'pembayaran' : pembayaran,
+                        'detail_pesanan': detail_pesanan
+                    })
+
                     $store.dispatch('setCartEmpty')
                     document.addEventListener('deviceready', function () {
                         var generateData = function() {
