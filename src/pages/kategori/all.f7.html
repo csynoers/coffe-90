@@ -48,9 +48,13 @@
     </div>
 </template>
 <script>
-export default (props, { $store, $on }) => {
+export default (props, {$f7, $store, $on }) => {
     const kategori = $store.getters.kategori;
 
+    $on('pageInit', () => {
+        // get kategori
+        $store.dispatch('getKategori');
+    });
     return $render;
 }
 </script>

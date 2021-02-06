@@ -39,7 +39,7 @@
                             ${menu.value.map((item) => $h`
                                 <tr>
                                     <td class="label-cell">${item.nama_menu}</td>
-                                    <td class="label-cell">${nama_kategori(item.id_kategori)}</td>
+                                    <td class="label-cell">${item.nama_kategori}</td>
                                     <td class="label-cell">${item.jenis_menu}</td>
                                     <td class="label-cell">${item.jenis_menu == 'Stok' ? item.stok : item.status_nonstok }</td>
                                     <td class="label-cell"><span class="${item.status_menu=='Aktif' ? 'text-color-green' : 'text-color-red'}">${item.status_menu}</span></td>
@@ -58,15 +58,12 @@
 </template>
 <script>
 export default (props, { $store, $on }) => {
-    const kategori = $store.getters.kategori;
     const menu = $store.getters.menu;
 
-    let nama_kategori = function(id){
-        let cari = kategori.value.find(obj => {
-            return obj.id_kategori === id;
-        })
-        return cari.nama_kategori;
-    }
+    $on('pageInit', () => {
+        // get menu
+        $store.dispatch('getMenu');
+    });
 
     return $render;
 }

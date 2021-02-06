@@ -68,88 +68,9 @@ const store = createStore({
         registered: false
       },
     ],
-    kategori: [
-      {
-        id_kategori : '1',
-        nama_kategori : 'Ice Cream Roll',
-      },
-      {
-        id_kategori : '2',
-        nama_kategori : 'Soft Drink',
-      },
-    ],
-    menu: [
-      {
-        id_menu: '1', 
-        id_kategori: '1',
-        nama_menu: 'AFOGATTO',
-        jenis_menu: 'Stok',
-        stok: 10,
-        status_nonstok: null,
-        status_menu: 'Aktif',
-        harga: 4000
-      },
-      {
-        id_menu: '2', 
-        id_kategori: '1',
-        nama_menu: 'CHOCOLATE',
-        jenis_menu: 'Stok',
-        stok: 10,
-        status_nonstok: null,
-        status_menu: 'Aktif',
-        harga: 32000
-      },
-      {
-        id_menu: '3', 
-        id_kategori: '1',
-        nama_menu: 'GREEN TEA',
-        jenis_menu: 'Stok',
-        stok: 10,
-        status_nonstok: null,
-        status_menu: 'Aktif',
-        harga: 28000
-      },
-      {
-        id_menu: '4', 
-        id_kategori: '1',
-        nama_menu: 'RED VELVET',
-        jenis_menu: 'Stok',
-        stok: 10,
-        status_nonstok: null,
-        status_menu: 'Aktif',
-        harga: 28000
-      },
-      {
-        id_menu: '5', 
-        id_kategori: '1',
-        nama_menu: 'VANILLA',
-        jenis_menu: 'Stok',
-        stok: 10,
-        status_nonstok: null,
-        status_menu: 'Aktif',
-        harga: 28000
-      },
-      {
-        id_menu: '5', 
-        id_kategori: '1',
-        nama_menu: 'ESPRESSO',
-        jenis_menu: 'Stok',
-        stok: 10,
-        status_nonstok: null,
-        status_menu: 'Aktif',
-        harga: 32000
-      },
-      {
-        id_menu: '6', 
-        id_kategori: '2',
-        nama_menu: 'AQUA (330 ML)',
-        jenis_menu: 'Stok',
-        stok: 10,
-        status_nonstok: null,
-        status_menu: 'Aktif',
-        harga: 4000
-      },
-    ],
+    kategori: [],
+    menu: [],
+    daftar_menu: [],
     cart: [
       // {
       //   id: 1,
@@ -200,6 +121,9 @@ const store = createStore({
     ], 
   },
   getters: {
+    url({ state }) {
+      return state.url;
+    },
     products({ state }) {
       return state.products;
     },
@@ -211,6 +135,9 @@ const store = createStore({
     },
     menu({ state }) {
       return state.menu;
+    },
+    daftar_menu({ state }) {
+      return state.daftar_menu;
     },
     cart({ state }) {
       return state.cart;
@@ -232,6 +159,27 @@ const store = createStore({
         .then((res) => res.json())
         .then((users) => {
           state.products = users;
+        })
+    },
+    getKategori({ state }) {
+      fetch(`${state.url}/kategori`)
+        .then((res) => res.json())
+        .then((kategori) => {
+          state.kategori = kategori;
+        })
+    },
+    getMenu({ state }) {
+      fetch(`${state.url}/menu`)
+        .then((res) => res.json())
+        .then((menu) => {
+          state.menu = menu;
+        })
+    },
+    getDaftarMenu({ state }) {
+      fetch(`${state.url}/daftar-menu`)
+        .then((res) => res.json())
+        .then((daftar_menu) => {
+          state.daftar_menu = daftar_menu;
         })
     },
     addProduct({ state }, product) {

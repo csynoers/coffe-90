@@ -51,29 +51,42 @@
 </template>
 <script>
 export default (props, { $, $store, $on, $f7, $f7router }) => {
+    const url = $store.getters.url.value;
 
-$on('pageInit', () => {
+    $on('pageInit', () => {
 
-    $('#formAddKategori').on('submit', function () {
-        var formData = $f7.form.convertToData('#formAddKategori');
+        $('#formAddKategori').on('submit', function () {
+            var formData = $f7.form.convertToData('#formAddKategori');
 
-        let kategori= $f7.store.state.kategori;
-        let cek = kategori.find(obj => {
-            return obj.nama_kategori === formData.nama_kategori;
-        })
-        if ( cek ) {
-            $f7.dialog.alert(`Maaf kategori menu "${formData.nama_kategori}" sudah digunakan, silahkan masukan kategori yang berbeda`);
-        } else {
-            formData.id_kategori = (kategori.length+1).toString(); 
-            // store kategori
-            $store.dispatch('addKategori', formData);
+            $f7.request.post(`${url}/kategori`, formData)
+            .then(function (res) {
+                let data = JSON.parse(res.data);
+                if ( data.status == 201 ) {
+                    $f7.dialog.alert('Data Kategori baru berhasil ditambahkan');
+                    $f7router.back({force  : true});
+                }
+                if ( data.status == 204 ) {
+                    $f7.dialog.alert(`Maaf kategori menu "${formData.nama_kategori}" sudah digunakan, silahkan masukan kategori yang berbeda`);
+                }
+            });
 
-            $f7.dialog.alert('Data Kategori baru berhasil ditambahkan');
-            $f7router.back({force  : true});
-        }
+            // let kategori= $f7.store.state.kategori;
+            // let cek = kategori.find(obj => {
+            //     return obj.nama_kategori === formData.nama_kategori;
+            // })
+            // if ( cek ) {
+            //     $f7.dialog.alert(`Maaf kategori menu "${formData.nama_kategori}" sudah digunakan, silahkan masukan kategori yang berbeda`);
+            // } else {
+            //     formData.id_kategori = (kategori.length+1).toString(); 
+            //     // store kategori
+            //     $store.dispatch('addKategori', formData);
+
+            //     $f7.dialog.alert('Data Kategori baru berhasil ditambahkan');
+            //     $f7router.back({force  : true});
+            // }
+        });
+        
     });
-    
-});
 
 return $render;
 }

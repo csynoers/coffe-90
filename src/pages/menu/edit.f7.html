@@ -129,6 +129,9 @@ export default (props,{$, $f7, $store, $f7route, $f7router, $update, $on, $onMou
     const kategori = $store.getters.kategori;
 
     $on('pageInit', (e, page) => {
+        // get kategori
+        $store.dispatch('getKategori');
+        
         console.log('pageInit', page);
         let get = $f7route.params;
         let menu = $store.getters.menu;

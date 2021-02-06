@@ -38,13 +38,13 @@
                 <h2>Sistem Pemesanan Cafe</h2>
                 <img src="static/logo/logo-small.png" alt="" width="50%" />
             </div> -->
-            ${daftar_menu.map((item) => $h`
+            ${daftar_menu.value.map((item) => $h`
                 <div class="block-title">${item.nama_kategori}</div>
                 <div class="list">
                     <ul>
-                        ${item.menus.map((i) => $h`
+                        ${item.menu.map((i) => $h`
                             <li>
-                            <a data-id-menu="${i.id_menu}" data-menu="${i.nama_menu}" data-stok="${i.stok}" data-jenis-menu="${i.jenis_menu}" data-harga="${i.harga}" data-kategori="${item.nama_kategori}" class="item-link item-content tambah-pesanan" href="#" >
+                            <a @click="${()=>tambahPesan(i)}" data-id-menu="${i.id_menu}" data-menu="${i.nama_menu}" data-stok="${i.stok}" data-jenis-menu="${i.jenis_menu}" data-harga="${i.harga}" data-kategori="${item.nama_kategori}" class="item-link item-content tambah-pesanan" href="#" >
                                 <div class="item-media"><i class="icon icon-f7"></i></div>
                                 <div class="item-inner">
                                     <div class="item-title">${i.nama_menu}</div>
@@ -84,19 +84,130 @@ export default (props,{ $on, $, $f7, $f7ready, $store, $f7route, $f7router, $upd
     //     }
     // });
 
-    let kategori = $store.getters.kategori;
-    let menu = $store.getters.menu;
+    const daftar_menu = $store.getters.daftar_menu;
 
-    let daftar_menu = [];
-    kategori.value.forEach((item,index) => {
-        item.menus = [];
-        menu.value.forEach((itemMenu,indexMenu) => {
-            if ( itemMenu.id_kategori === item.id_kategori ) {
-                item.menus.push(itemMenu);
+    const tambahPesan = (i) => {
+        console.log(i)
+
+        // Close inline sheet before
+        $f7.sheet.close('.my-sheet');
+
+        var dynamicSheet = $f7.sheet.create({
+            content: `
+                <div class="sheet-modal">
+                    <div class="toolbar">
+                    <div class="toolbar-inner">
+                        <div class="left"><span class="padding-left">${i.nama_menu}</span></div>
+                        <div class="right">
+                        <span class="padding-right">Rp.${i.harga}</span>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="sheet-modal-inner">
+                        <div class="block" style="margin-top: -31px">
+                            <div class="list no-hairlines-mdXX">
+                                <ul>
+                                    <li class="item-content item-input">
+                                        <div class="item-inner text-align-center">
+                                            <div class="item-input-wrap">
+                                                <div class="stepper stepper-round stepper-init stepper-jumlah">
+                                                    <div class="stepper-button-minus"></div>
+                                                    <div class="stepper-input-wrap">
+                                                        <input type="text" value="1" min="1" max="100" step="1" readonly />
+                                                    </div>
+                                                    <div class="stepper-button-plus"></div>
+                                                </div>          
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Keterangan</div>
+                                            <div class="item-input-wrap">
+                                                <textarea id="keteranganHome" rows="2" placeholder="keterangan (opsional)" style="height: auto !important"></textarea>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <button id="tambahDetailPesanan" type="button" class="col button button-fill">Tambah Pesanan</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            `,
+
+            // Events
+            on: {
+                open: function (sheet) {
+                    console.log('Sheet open');
+
+                    stepperAddCart = $f7.stepper.create({
+                        el: '.stepper-jumlah',
+                        on: {
+                            change: function () {
+                                console.log('Stepper value changed')
+                            }
+                        }
+                    })
+                    stepperAddCart.min= 1;
+                    if ( i.jenis_menu === 'Stok' ) {
+                        stepperAddCart.max= parseInt(i.stok);
+                    }
+                    stepperAddCart.step= 1;
+                    stepperAddCart.value= 1;
+                    // console.log(stepperAddCart)
+
+                    $('#tambahDetailPesanan').on('click',function(){
+                        let qty = parseInt(stepperAddCart.value);
+                        let keterangan = $('#keteranganHome').val() ? $('#keteranganHome').val() : '-';
+
+                        // add to cart
+                        $store.dispatch('addCart', {
+                            id_menu: i.id_menu,
+                            nama_menu: i.nama_menu,
+                            kategori: i.nama_kategori,
+                            keterangan: keterangan,
+                            harga: i.harga,
+                            qty: qty
+                        });
+                        stepperAddCart.destroy()
+                        dynamicSheet.close()
+                        // $f7.panel.open('.panel-right')
+                        // setTimeout(() => {
+                            // $f7.panel.close('.panel-right')
+                        // }, 1000);
+                        // dynamicSheet.destroy();
+                        // stepper.destroy();
+                        // $f7.stepper.destroy('.stepper-jumlah')
+                        
+                    })
+                },
+                opened: function (sheet) {
+                    console.log('Sheet opened');
+                }
             }
         });
-        daftar_menu.push(item)
-    });
+
+
+        // Events also can be assigned on instance later
+        dynamicSheet.on('close', function (sheet) {
+            console.log('Sheet close');
+            // dynamicSheet.destroy()
+        });
+        dynamicSheet.on('closed', function (sheet) {
+            console.log('Sheet closed');
+            $f7.panel.open('.panel-right')
+        });
+        // Open dynamic sheet
+        dynamicSheet.open();        
+    }
 
     // let stepperCart;
     let stepperAddCart;
@@ -117,9 +228,12 @@ export default (props,{ $on, $, $f7, $f7ready, $store, $f7route, $f7router, $upd
     })
 
     $on('pageInit', (e) => {
+        // get daftar_menu
+        $store.dispatch('getDaftarMenu');
 
         // Open dynamic sheet
         $('.tambah-pesanan').on('click', function () {
+            alert('click')
             let data = {
                 id_menu: $(this).data('id-menu'),
                 nama_menu: $(this).data('menu'),
