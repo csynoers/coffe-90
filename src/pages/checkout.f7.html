@@ -101,6 +101,7 @@
 </template>
 <script>
 export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    const url = $store.getters.url.value;
     let cart = $store.getters.cart;
 
     console.log(cart)
@@ -173,8 +174,9 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
 
                         return (year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds);
                     }
-
-                    let data = {
+                    
+                    
+                    let pesanan = {
                         id_user: 2,
                         nomor_meja: sel.meja.val(),
                         tanggal_pesanan: tanggal_pesanan()
@@ -182,7 +184,7 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
 
                     let pembayaran = {
                         tanggal_bayar: tanggal_pesanan(),
-                        jumlah_bayar: sel.bayar
+                        jumlah_bayar: bayar
                     };
 
                     let detail_pesanan = [];
@@ -193,30 +195,39 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
                             harga: detail.harga,
                             jumlah: detail.qty,
                             keterangan: detail.keterangan,
+                            nama_menu: detail.nama_menu,
                             status_pesanan_detail: "Belum Siap"
                         };
                         detail_pesanan.push(data_detail);
                     });
-                    
-                    console.log({
-                        'pesanan' : data,
+
+                    let formData = {
+                        'pesanan' : pesanan,
                         'pembayaran' : pembayaran,
                         'detail_pesanan': detail_pesanan
-                    })
+                    };
+
+                    $f7.request.post(`${url}/pesanan/create`, {'data':JSON.stringify(formData)})
+                    .then(function (res) {
+                        let data = JSON.parse(res.data);
+                        console.log(data);
+                        if ( data.status == 201 ) {
+                            $f7.dialog.alert('Pesanan berhasil dibuat');
+                            $f7router.back({force  : true});
+                        }
+                    });
 
                     $store.dispatch('setCartEmpty')
                     document.addEventListener('deviceready', function () {
                         var generateData = function() {
                             var result = [];
-                            $store.getters.pesanan_detail.value.forEach((item,index)=>{
-                                if ( parseInt(item.id_pesanan) === parseInt(id_pesanan) ) {
-                                    result.push(`
-                                        <div style="width: 100%; display: flex;">
-                                            <p style="width: 50%;">${item.jumlah} | ${getNamaMenu(item.id_menu).nama_menu}</p>
-                                            <p style="width: 50%; text-align: right;">Rp.${item.harga*item.jumlah}</p>
-                                        </div>
-                                    `);
-                                }
+                            detail_pesanan.forEach((item,index)=>{
+                                result.push(`
+                                    <div style="width: 100%; display: flex;">
+                                        <p style="width: 50%;">${item.jumlah} | ${item.nama_menu}}</p>
+                                        <p style="width: 50%; text-align: right;">Rp.${item.harga*item.jumlah}</p>
+                                    </div>
+                                `);
                                 
                             })
                             return result.join('');
@@ -229,8 +240,8 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
                                     <h4 style="text-align: center;">Coffe's 90</h4>
                                     <div style="border-bottom: dashed;"></div>
                                     <div style="width: 100%; display: flex;">
-                                        <p style="width: 50%;">Tanggal : ${data.tanggal_pesanan}</p>
-                                        <p style="width: 50%; text-align: right;">No Meja : ${data.nomor_meja}</p>
+                                        <p style="width: 50%;">Tanggal : ${pesanan.tanggal_pesanan}</p>
+                                        <p style="width: 50%; text-align: right;">No Meja : ${pesanan.nomor_meja}</p>
                                     </div>
                                     <div style="border-bottom: dashed;"></div>
                                     <div style="width: 100%; display: flex;">
