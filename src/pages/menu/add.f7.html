@@ -67,7 +67,7 @@
                                 <div class="item-inner">
                                     <div class="item-title item-label">Stok</div>
                                     <div class="item-input-wrap">
-                                        <input id="stokAddMenu" name="stok" type="text" required />
+                                        <input id="stokAddMenu" name="stok" type="number" required />
                                     </div>
                                 </div>
                             </div>
@@ -125,6 +125,7 @@
 </template>
 <script>
 export default (props,{$, $f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    const url = $store.getters.url.value;
     const kategori = $store.getters.kategori;
 
     $on('pageInit', (e, page) => {
@@ -149,14 +150,16 @@ export default (props,{$, $f7, $store, $f7route, $f7router, $update, $on, $onMou
 
         $('#formAddMenu').on('submit',function(){
             var formData = $f7.form.convertToData('#formAddMenu');
-            let menu = $f7.store.state.menu;
 
-            formData.id_menu = (menu.length+1).toString(); 
-            // store menu
-            $store.dispatch('addMenu', formData);
+            $f7.request.post(`${url}/menu/create`, formData)
+            .then(function (res) {
+                let data = JSON.parse(res.data);
+                if ( data.status == 201 ) {
+                    $f7.dialog.alert('Data Menu berhasil ditambahkan');
+                    $f7router.back({force  : true});
+                }
+            });
 
-            $f7.dialog.alert('Data Menu berhasil ditambahkan');
-            $f7router.back({force  : true});
         })
     });
 

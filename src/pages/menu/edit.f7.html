@@ -126,49 +126,43 @@
 </template>
 <script>
 export default (props,{$, $f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    const url = $store.getters.url.value;
     const kategori = $store.getters.kategori;
 
     $on('pageInit', (e, page) => {
         // get kategori
         $store.dispatch('getKategori');
-        
-        console.log('pageInit', page);
+
+        // get data
         let get = $f7route.params;
-        let menu = $store.getters.menu;
-        
-        let row = menu.value.find(obj => {
-            return obj.id_menu === get.menuId; 
-        })
+        $f7.request.get(`${url}/menu/${get.menuId}`)
+        .then(function (res) {
+            let json = JSON.parse(res.data);
 
-        console.log({
-            get: get,
-            menu: menu,
-            row: row
-        })
+            let formData = {
+                'id_menu': json.data.id_menu,
+                'nama_menu': json.data.nama_menu,
+                'id_kategori': json.data.id_kategori,
+                'jenis_menu': json.data.jenis_menu,
+                'stok': json.data.stok,
+                'status_nonstok': json.data.status_nonstok,
+                'harga': json.data.harga,
+                'status_menu': json.data.status_menu,
+            }
+            $f7.form.fillFromData('#formEditMenu', formData);
 
-        let formData = {
-            'id_menu': row.id_menu,
-            'nama_menu': row.nama_menu,
-            'id_kategori': row.id_kategori,
-            'jenis_menu': row.jenis_menu,
-            'stok': row.stok,
-            'status_nonstok': row.status_nonstok,
-            'harga': row.harga,
-            'status_menu': row.status_menu,
-        }
-        $f7.form.fillFromData('#formEditMenu', formData);
-
-        if ( row.jenis_menu == 'Stok' ) {
-            $('#stokEditMenu').prop("required",true);            
-            $('#stokEditMenuWrapper').css("display","block");            
-            $('#statusNonStokEditMenu').prop("required",false);            
-            $('#statusNonStokEditMenuWrapper').css("display","none");            
-        } else {
-            $('#stokEditMenu').prop("required",false);            
-            $('#stokEditMenuWrapper').css("display","none");            
-            $('#statusNonStokEditMenu').prop("required",true);            
-            $('#statusNonStokEditMenuWrapper').css("display","block");            
-        }
+            if ( json.data.jenis_menu == 'Stok' ) {
+                $('#stokEditMenu').prop("required",true);            
+                $('#stokEditMenuWrapper').css("display","block");            
+                $('#statusNonStokEditMenu').prop("required",false);            
+                $('#statusNonStokEditMenuWrapper').css("display","none");            
+            } else {
+                $('#stokEditMenu').prop("required",false);            
+                $('#stokEditMenuWrapper').css("display","none");            
+                $('#statusNonStokEditMenu').prop("required",true);            
+                $('#statusNonStokEditMenuWrapper').css("display","block");            
+            }
+        });
 
         $('#jenisMenuAddMenu').on('change',function(){
             if ( $(this).val() === 'Stok' ) {
@@ -186,11 +180,16 @@ export default (props,{$, $f7, $store, $f7route, $f7router, $update, $on, $onMou
 
         $('#formEditMenu').on('submit', function () {
             let formData = $f7.form.convertToData('#formEditMenu');
-            // update menu
-            $store.dispatch('updateMenu', formData);
 
-            $f7.dialog.alert('Data Menu berhasil diubah');
-            $f7router.back({force  : true});
+            $f7.request.post(`${url}/menu/update/${formData.id_menu}`, formData)
+            .then(function (res) {
+                let data = JSON.parse(res.data);
+                if ( data.status == 201 ) {
+                    $f7.dialog.alert('Data Menu berhasil diubah');
+                    $f7router.back({force  : true});
+                }
+            });
+            
         });
     });
 
