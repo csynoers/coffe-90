@@ -14,7 +14,6 @@
                 </div>
             </div>
             <div class="page-content">
-              
                 <div class="block-title">Owner</div>
                 <div class="list links-list no-margin-topXXX">
                     <ul id="leftMenu">
@@ -27,6 +26,9 @@
                         <li>
                             <a href="/laporan-penjualan/" data-view=".view-main" class="panel-close">Laporan Penjualan</a>
                         </li>
+                        <!-- <li>
+                            <a href="/laporan-produk/" data-view=".view-main" class="panel-close">Laporan Produk</a>
+                        </li> -->
                         <li>
                             <a href="/laporan-stok/" data-view=".view-main" class="panel-close">Laporan Stok</a>
                         </li>
@@ -41,6 +43,13 @@
                         <li>
                             <a href="/daftar-antrian/" data-view=".view-main" class="panel-close">Pesanan</a>
                         </li>
+                        
+                        <!-- <li>
+                            <a href="/karyawan/" data-view=".view-main" class="panel-close">Karyawan</a>
+                        </li> -->
+                        <!-- <li>
+                            <a href="/kursi/" data-view=".view-main" class="panel-close">No Kursi</a>
+                        </li> -->
                         <li>
                             <a href="/kategori/" data-view=".view-main" class="panel-close">Kategori Menu</a>
                         </li>
@@ -57,6 +66,13 @@
                         </li>
                     </ul>
                 </div>
+                <!-- <div class="list links-list no-margin-topXXX">
+                    <ul id="leftMenu">
+                        <li>
+                            <a href="/konfirmasi-pesanan/" data-view=".view-main" class="panel-close">Makanan siap disajikan</a>
+                        </li>
+                    </ul>
+                </div> -->
             </div>
             </div>
         </div>
@@ -215,10 +231,7 @@
 export default (props, { $f7,$f7ready, $store, $update ,$on,$onMounted}) => {
     const $ = $f7.$;
     let cart = $store.getters.cart;
-
-    let level = $store.getters.level.value;
     console.log('HOME ADMIN CART',cart);
-    console.log('HOME ADMIN level',level);
 
     let title_user_page = '';
 
