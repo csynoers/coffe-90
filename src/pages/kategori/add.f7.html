@@ -58,7 +58,7 @@ export default (props, { $, $store, $on, $f7, $f7router }) => {
         $('#formAddKategori').on('submit', function () {
             var formData = $f7.form.convertToData('#formAddKategori');
 
-            $f7.request.post(`${url}/kategori`, formData)
+            $f7.request.post(`${url}/kategori/create`, formData)
             .then(function (res) {
                 let data = JSON.parse(res.data);
                 if ( data.status == 201 ) {
@@ -69,21 +69,6 @@ export default (props, { $, $store, $on, $f7, $f7router }) => {
                     $f7.dialog.alert(`Maaf kategori menu "${formData.nama_kategori}" sudah digunakan, silahkan masukan kategori yang berbeda`);
                 }
             });
-
-            // let kategori= $f7.store.state.kategori;
-            // let cek = kategori.find(obj => {
-            //     return obj.nama_kategori === formData.nama_kategori;
-            // })
-            // if ( cek ) {
-            //     $f7.dialog.alert(`Maaf kategori menu "${formData.nama_kategori}" sudah digunakan, silahkan masukan kategori yang berbeda`);
-            // } else {
-            //     formData.id_kategori = (kategori.length+1).toString(); 
-            //     // store kategori
-            //     $store.dispatch('addKategori', formData);
-
-            //     $f7.dialog.alert('Data Kategori baru berhasil ditambahkan');
-            //     $f7router.back({force  : true});
-            // }
         });
         
     });

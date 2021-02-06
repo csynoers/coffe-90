@@ -52,29 +52,38 @@
 </template>
 <script>
 export default (props, { $, $store, $on, $f7, $f7route, $f7router }) => {
+    const url = $store.getters.url.value;
+
     $on('pageInit', () => {
+        // get data
         let get = $f7route.params;
-        let kategori = $store.getters.kategori;
+        $f7.request.get(`${url}/kategori/${get.kategoriId}`)
+        .then(function (res) {
+            let json = JSON.parse(res.data);
+            let formData = {
+                'nama_kategori': json.data.nama_kategori,
+                'id_kategori': json.data.id_kategori,
+            }
+            $f7.form.fillFromData('#formEditKategori', formData);
+        });
+
         
-        let row = kategori.value.find(obj => {
-            return obj.id_kategori === get.kategoriId; 
-        })
-
-        console.log(kategori)
-
-        let formData = {
-            'nama_kategori': row.nama_kategori,
-            'id_kategori': row.id_kategori,
-        }
-        $f7.form.fillFromData('#formEditKategori', formData);
 
         $('#formEditKategori').on('submit', function () {
             let formData = $f7.form.convertToData('#formEditKategori');
-            // update kategori
-            $store.dispatch('updateKategori', formData);
 
-            $f7.dialog.alert('Data Kategori berhasil diubah');
-            $f7router.back({force  : true});
+            $f7.request.post(`${url}/kategori/update/${formData.id_kategori}`, formData)
+            .then(function (res) {
+                let data = JSON.parse(res.data);
+                if ( data.status == 201 ) {
+                    $f7.dialog.alert('Data Kategori berhasil diubah');
+                    $f7router.back({force  : true});
+                }
+                if ( data.status == 204 ) {
+                    $f7.dialog.alert(`Maaf kategori menu "${formData.nama_kategori}" sudah digunakan, silahkan masukan kategori yang berbeda`);
+                }
+            });
+
         });
 
     });
