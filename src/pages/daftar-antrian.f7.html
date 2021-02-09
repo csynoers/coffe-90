@@ -73,6 +73,7 @@
 </template>
 <script>
 export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    const url = $store.getters.url.value;
     const daftar_antrian = $store.getters.daftar_antrian;
     
     const refreshPage = () => {
@@ -93,7 +94,44 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
             $f7.dialog.alert(`Maaf masih ada ${pesanan_belum_siap} menu yang belum siap, jadi belum bisa diantar mohon menunggu`)
 
         } else { // jika sudah tidak ada lakukan update pada tabel: pesanan detail kolom pesanan_detail_status menjadi 'Selesai'
-            
+            $f7.request({
+                url: `${url}/detail-group-pesan/${i.id_pesanan}`,
+                dataType: 'json',
+                method: 'PUT',
+                data: {status_pesanan_detail: 'Selesai'}, 
+                statusCode: {
+                    404: function (xhr) {
+                        console.log("URL not found");
+                    },
+                    400: function (xhr) {
+                        console.log("Bad request. Some of the inputs provided to the request aren't valid.");
+                    },
+                    401: function (xhr) {
+                        console.log("Not authenticated. The user session isn't valid.");
+                    },
+                    403: function (xhr) {
+                        console.log("The user isn't authorized to perform the specified request.");
+                    },
+                    500: function (xhr) {
+                        console.log("Internal server error. Additional details will be contained on the server logs.");
+                    },
+                    201: function (xhr) {
+                        console.log("The requested resource has been created.");
+                    }
+                },
+                success: function (data, status, xhr) {
+                    console.log(data)
+                    if ( status == 200 ) {
+                        $f7.dialog.alert('Data Menu berhasil diubah');
+                        $f7router.navigate('/daftar-antrian/',{reloadCurrent  : true});
+                    }
+                },
+                error: function (xhr, status) {
+                    console.log(xhr);
+                    console.log(JSON.stringify(xhr));
+                    console.log(status);
+                }
+            });
         }
     }
 

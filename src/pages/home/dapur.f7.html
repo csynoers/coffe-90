@@ -69,19 +69,43 @@ export default (props,{ $f7, $on, $store, $f7route, $f7router, $update, $onMount
     }
 
     const ubahStatusBelumSiap = (i) => {
-        
-        let formData = {
-            'status_pesanan_detail' : 'Siap'
-        };
 
-        $f7.request.post(`${url}/detail/update/${i.id_pesanan_detail}`, {'data':JSON.stringify(formData)})
-        .then(function (res) {
-            let data = JSON.parse(res.data);
-
-            if ( data.status == 201 ) {
-                $f7.dialog.alert('Data Menu berhasil diubah');
-
-                $f7router.navigate('/home-dapur/',{reloadCurrent  : true});
+        $f7.request({
+            url: `${url}/detail/${i.id_pesanan_detail}`,
+            dataType: 'json',
+            method: 'PUT',
+            data: {status_pesanan_detail: 'Siap'}, 
+            statusCode: {
+                404: function (xhr) {
+                    console.log("URL not found");
+                },
+                400: function (xhr) {
+                    console.log("Bad request. Some of the inputs provided to the request aren't valid.");
+                },
+                401: function (xhr) {
+                    console.log("Not authenticated. The user session isn't valid.");
+                },
+                403: function (xhr) {
+                    console.log("The user isn't authorized to perform the specified request.");
+                },
+                500: function (xhr) {
+                    console.log("Internal server error. Additional details will be contained on the server logs.");
+                },
+                201: function (xhr) {
+                    console.log("The requested resource has been created.");
+                }
+            },
+            success: function (data, status, xhr) {
+                console.log(data)
+                if ( status == 200 ) {
+                    $f7.dialog.alert('Data Menu berhasil diubah');
+                    $f7router.navigate('/home-dapur/',{reloadCurrent  : true});
+                }
+            },
+            error: function (xhr, status) {
+                console.log(xhr);
+                console.log(JSON.stringify(xhr));
+                console.log(status);
             }
         });
         
