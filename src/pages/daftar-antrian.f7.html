@@ -4,13 +4,13 @@
         <div class="navbar">
             <div class="navbar-bg"></div>
             <div class="navbar-inner sliding">
-            <div class="left">
-                <a href="#" class="link back">
-                <i class="icon icon-back"></i>
-                <span class="if-not-md">Back</span>
-                </a>
-            </div>
-            <div class="title">Daftar Pesanan</div>
+                <div class="left">
+                    <a href="#" class="link back">
+                    <i class="icon icon-back"></i>
+                    <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Daftar Pesanan</div>
             </div>
         </div>
         <!-- Toolbar-->
@@ -22,38 +22,50 @@
         <!-- Scrollable page content-->
         <div class="page-content">
             <div class="block">
+                <p class="text-align-center">
+                    <a href="#" class="button button-outline button-round button-small icon-only" @click="${refreshPage}">
+                        <i class="icon material-icons margin-right-half"></i>
+                        Klik disini untuk menyegarkan halaman
+                    </a>
+                </p>
                 <div class="">
-                    <!-- <div class="block-title">Detail Pesanan :</div> -->
-                    ${daftar_antrian.value.map((item) => $h`
-                        <div class="card card-outline ambil-daftar-pesanan-admin" data-id="${item.id_pesanan}">
-                            <div class="card-content card-content-padding">
-                                <div>Nomor Meja: ${item.nomor_meja}</div>
-                                <div class="block-title no-margin-left">Detail Pesanan :</div>
-                                <div class="list no-hairlines-mdXX">
-                                    <ul>
-                                        <li>
-                                            <div class="item-content">
-                                                <div class="item-inner">
-                                                    <div class="float-left">Nama Menu</div>
-                                                    <div class="float-right">Status</div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        ${item.detail.map((i)=>$h`
+                    ${daftar_antrian.value.length > 0 ? $h`
+                        ${daftar_antrian.value.map((item) => $h`
+                            <div class="card card-outline" @click="${()=>{antarPesanan(item)}}">
+                                <div class="card-content card-content-padding">
+                                    <div>Nomor Meja: ${item.nomor_meja}</div>
+                                    <div class="block-title no-margin-left">Detail Pesanan :</div>
+                                    <div class="list no-hairlines-mdXX">
+                                        <ul>
                                             <li>
                                                 <div class="item-content">
                                                     <div class="item-inner">
-                                                        <div class="float-left">${i.nama_menu}</div>
-                                                        <div class="float-right"><span class="${i.status_pesanan_detail=='Siap' ? 'text-color-green' : 'text-color-red'}">${i.status_pesanan_detail}</span></div>
+                                                        <div class="float-left">Nama Menu</div>
+                                                        <div class="float-right">Status</div>
                                                     </div>
                                                 </div>
                                             </li>
-                                        `)}
-                                    </ul>
+                                            ${item.detail.map((i)=>$h`
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner">
+                                                            <div class="float-left">${i.nama_menu}</div>
+                                                            <div class="float-right"><span class="${i.status_pesanan_detail=='Siap' ? 'text-color-green' : 'text-color-red'}">${i.status_pesanan_detail}</span></div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            `)}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
+                        `)}
+
+                    ` : $h`
+                        <div class="block block-strong text-align-center">
+                            Belum ada Pesanan
                         </div>
-                    `)}
+                    `}
                 </div>
             </div>
         </div>
@@ -63,11 +75,32 @@
 export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
     const daftar_antrian = $store.getters.daftar_antrian;
     
+    const refreshPage = () => {
+        $f7router.navigate('/daftar-antrian/',{reloadCurrent  : true});
+    }
+
+    const antarPesanan = (i) => {
+        let pesanan = i;
+        let pesanan_belum_siap = 0; // atur nilai awal untuk pesanan yang belum siap
+
+        i.detail.forEach((j) => {
+            if ( j.status_pesanan_detail == 'Belum Siap' ) {
+                pesanan_belum_siap++;
+            }
+        });
+
+        if ( pesanan_belum_siap > 0 ) { // cek jika masih ada pesanan yang belum siap 
+            $f7.dialog.alert(`Maaf masih ada ${pesanan_belum_siap} menu yang belum siap, jadi belum bisa diantar mohon menunggu`)
+
+        } else { // jika sudah tidak ada lakukan update pada tabel: pesanan detail kolom pesanan_detail_status menjadi 'Selesai'
+            
+        }
+    }
+
     $on('pageInit', (e) => {
         // get daftar_menu belum siap/Siap
         $store.dispatch('getDaftarAntrian');
 
-        console.log(daftar_antrian)
     });
 
     return $render;

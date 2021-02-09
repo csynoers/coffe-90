@@ -11,13 +11,8 @@
             </div>
             <div class="title">Coffe's 90</div>
             <div class="right">
-                <!-- <a href="/notifications/" class="link icon-only"> -->
-                <!-- <i class="icon material-icons if-md">notifications</i> -->
-                <!-- <img src="static/icons/notification.png" alt="" style="height: 22px;" /> -->
-                <!-- </a> -->
                 <a href="/logout/" class="link icon-only">
-                <!-- <i class="icon material-icons if-md">notifications</i> -->
-                <img src="static/icons/logout.jpg" alt="" style="height: 20px;" />
+                    <img src="static/icons/logout.jpg" alt="" style="height: 20px;" />
                 </a>
             </div>
             </div>
@@ -31,22 +26,32 @@
         <!-- Scrollable page content-->
         <div class="page-content">
             <div class="block">
-                <!-- <div class="row">
-                    <a href="#" class="col button button-small button-fill margin-bottom">Update Data</a>
-                    <a href="#" class="col button button-small button-fill margin-bottom">Lapor Stok Data</a>
-                </div> -->
+                <p class="text-align-center">
+                    <a href="#" class="button button-outline button-round button-small icon-only" @click="${refreshPage}">
+                        <i class="icon material-icons margin-right-half"></i>
+                        Klik disini untuk menyegarkan halaman
+                    </a>
+                </p>
                 <div>
-                    <div class="block-title">Daftar Pesanan :</div>
-                    ${menu_belum_siap.value.map((item) => $h`
-                        <div class="card card-outline ambil-daftar-pesanan-dapur" @click="${()=>ubahStatusBelumSiap(item)}">
-                            <div class="card-content card-content-padding">
-                                <div>Meja no: ${item.nomor_meja}</div>
-                                <div>Nama Menu: ${item.nama_menu}</div>
-                                <div>Jumlah: ${item.jumlah}</div>
-                                <div>Keterangan: ${item.keterangan}</div>
+                    ${menu_belum_siap.value.length > 0 ? $h`
+                        <div class="block-title">Daftar Pesanan :</div>
+                        ${menu_belum_siap.value.map((item) => $h`
+                            <div class="card card-outline ambil-daftar-pesanan-dapur" @click="${()=>ubahStatusBelumSiap(item)}">
+                                <div class="card-content card-content-padding">
+                                    <div>Meja no: ${item.nomor_meja}</div>
+                                    <div>Nama Menu: ${item.nama_menu}</div>
+                                    <div>Jumlah: ${item.jumlah}</div>
+                                    <div>Keterangan: ${item.keterangan}</div>
+                                </div>
                             </div>
+                        `)}
+                    ` : $h`
+                        <div class="block block-strong text-align-center">
+                            <p>
+                                Belum ada Pesanan
+                            </p>
                         </div>
-                    `)}
+                    `}
                 </div>
             </div>
         </div>
@@ -59,8 +64,12 @@ export default (props,{ $f7, $on, $store, $f7route, $f7router, $update, $onMount
     const $ = $f7.$;
     const menu_belum_siap = $store.getters.menu_belum_siap;
 
+    const refreshPage = () => {
+        $f7router.navigate('/home-dapur/',{reloadCurrent  : true});
+    }
+
     const ubahStatusBelumSiap = (i) => {
-        console.log('Pesanan Klik',i)
+        
         let formData = {
             'status_pesanan_detail' : 'Siap'
         };
@@ -71,7 +80,6 @@ export default (props,{ $f7, $on, $store, $f7route, $f7router, $update, $onMount
 
             if ( data.status == 201 ) {
                 $f7.dialog.alert('Data Menu berhasil diubah');
-                // $store.dispatch('getMenuBelumSiap');
 
                 $f7router.navigate('/home-dapur/',{reloadCurrent  : true});
             }

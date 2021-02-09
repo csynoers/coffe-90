@@ -15,12 +15,7 @@
                     <i class="icon material-icons">shopping_cart
                     </i>
                 </a>
-                <!-- <a href="/notifications/" class="link icon-only"> -->
-                <!-- <i class="icon material-icons if-md">notifications</i> -->
-                <!-- <img src="static/icons/notification.png" alt="" style="height: 22px;" /> -->
-                <!-- </a> -->
                 <a href="/login/" class="link icon-only">
-                <!-- <i class="icon material-icons if-md">notifications</i> -->
                 <img src="static/icons/logout.jpg" alt="" style="height: 20px;" />
                 </a>
             </div>
@@ -34,10 +29,6 @@
         </div>
         <!-- Scrollable page content-->
         <div class="page-content">
-            <!-- <div class="block text-align-center">
-                <h2>Sistem Pemesanan Cafe</h2>
-                <img src="static/logo/logo-small.png" alt="" width="50%" />
-            </div> -->
             ${daftar_menu.value.map((item) => $h`
                 <div class="block-title">${item.nama_kategori}</div>
                 <div class="list">
@@ -77,12 +68,6 @@
 </template>
 <script>
 export default (props,{ $on, $, $f7, $f7ready, $store, $f7route, $f7router, $update, $onMounted }) => {
-    // let obj = arr.find((o, i) => {
-    //     if (o.value === 'this') {
-    //         arr[i] = { name: 'new string', value: 'this', other: 'that' };
-    //         return true; // stop searching
-    //     }
-    // });
 
     const daftar_menu = $store.getters.daftar_menu;
 
@@ -361,22 +346,7 @@ export default (props,{ $on, $, $f7, $f7ready, $store, $f7route, $f7router, $upd
             // Open dynamic sheet
             dynamicSheet.open();
         });
-
-        // let panel = $f7.panel.get('.panel-right');
-        // console.log(panel)
-      // Create swipe-to-close Sheet
-    //   app.sheet.create({
-    //     el: '.my-sheet-swipe-to-close',
-    //     swipeToClose: true,
-    //     backdrop: true,
-    //   });
-    //   // Create swipe-to-step Sheet
-    //   app.sheet.create({
-    //     el: '.my-sheet-swipe-to-step',
-    //     swipeToClose: true,
-    //     swipeToStep: true,
-    //     backdrop: true,
-    //   });
+        
     })
 
     return $render;
