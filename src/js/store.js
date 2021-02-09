@@ -3,9 +3,9 @@ import { createStore } from 'framework7';
 
 const store = createStore({
   state: {
-    // url: 'http://localhost:8081/',
-    level: 0,
-    url: 'https://restapp.site.co.id',
+    url: 'http://localhost:8081',
+    // level: 0,
+    // url: 'https://restapp.site.co.id',
     products: [
       {
         id: '1',
@@ -70,6 +70,8 @@ const store = createStore({
         registered: false
       },
     ],
+    laporan_penjualan: [],
+    laporan_stok: [],
     kategori: [],
     menu: [],
     daftar_menu: [],
@@ -138,6 +140,12 @@ const store = createStore({
     users({ state }) {
       return state.users;
     },
+    laporan_penjualan({ state }) {
+      return state.laporan_penjualan;
+    },
+    laporan_stok({ state }) {
+      return state.laporan_stok;
+    },
     kategori({ state }) {
       return state.kategori;
     },
@@ -176,6 +184,20 @@ const store = createStore({
         .then((res) => res.json())
         .then((users) => {
           state.products = users;
+        })
+    },
+    getLaporanPenjualan({ state }) {
+      fetch(`${state.url}/laporan/penjualan`)
+        .then((res) => res.json())
+        .then((laporan_penjualan) => {
+          state.laporan_penjualan = laporan_penjualan;
+        })
+    },
+    getLaporanStok({ state }) {
+      fetch(`${state.url}/laporan/stok`)
+        .then((res) => res.json())
+        .then((laporan_stok) => {
+          state.laporan_stok = laporan_stok;
         })
     },
     getKategori({ state }) {

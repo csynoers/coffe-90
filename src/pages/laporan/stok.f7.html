@@ -35,14 +35,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${menu.value.map((Mitem,Mindex)=>$h`
+                            ${laporan_stok.value.map((item,index)=>$h`
                                 <tr>
-                                    <td class="numeric-cell">${Mindex+1}</td>
-                                    <td class="label-cell">${Mitem.nama_menu}</td>
-                                    <td class="label-cell">${getKategoriName(Mitem.id_kategori).nama_kategori}</td>
-                                    <td class="numeric-cell">${Mitem.jenis_menu}</td>
-                                    <td class="numeric-cell">${Mitem.jenis_menu == 'Stok' ? Mitem.stok : Mitem.status_nonstok }</td>
-                                    <td class="numeric-cell">${Mitem.harga}</td>
+                                    <td class="numeric-cell">${index+1}</td>
+                                    <td class="label-cell">${item.nama_menu}</td>
+                                    <td class="label-cell">${item.nama_kategori}</td>
+                                    <td class="numeric-cell">${item.jenis_menu}</td>
+                                    <td class="numeric-cell">${item.jenis_menu == 'Stok' ? item.stok : item.status_nonstok }</td>
+                                    <td class="numeric-cell">Rp.${item.harga}</td>
                                 </tr>
                             `)}
                         </tbody>
@@ -55,27 +55,23 @@
 </template>
 <script>
 export default (props,{$, $f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
-    let menu = $store.getters.menu;
-    let kategori = $store.getters.kategori;
-
-    let getKategoriName = function(id_kategori){
-        return kategori.value.find(o => parseInt(o.id_kategori) === parseInt(id_kategori));
-    }
-    console.log(menu);
-    console.log(kategori);
-
+    let laporan_stok = $store.getters.laporan_stok;
+    // 
     $on('pageInit', (e) => {
-        // window.print();
+        // mendapatkan laporan stok terbaru
+        $store.dispatch('getLaporanStok');
+
+        // proses export ke pdf
         $('#exportPdfStok').on('click',function(){
             
             var generateData = function() {
                 var result = [];
-                menu.value.forEach((Mitem,Mindex)=>{
+                laporan_stok.value.forEach((Mitem,Mindex)=>{
                     result.push(`
                         <tr>
                             <td class="numeric-cell">${Mindex+1}</td>
                             <td class="label-cell">${Mitem.nama_menu}</td>
-                            <td class="label-cell">${getKategoriName(Mitem.id_kategori).nama_kategori}</td>
+                            <td class="label-cell">${Mitem.nama_kategori}</td>
                             <td class="numeric-cell">${Mitem.jenis_menu}</td>
                             <td class="numeric-cell">${Mitem.jenis_menu == 'Stok' ? Mitem.stok : Mitem.status_nonstok }</td>
                             <td class="numeric-cell">${Mitem.harga}</td>
@@ -101,6 +97,7 @@ export default (props,{$, $f7, $store, $f7route, $f7router, $update, $on, $onMou
                 "Jumlah",
                 "Harga Satuan",
             ]);
+
             document.addEventListener('deviceready', function () {
             
                 cordova.plugins.pdf.htmlToPDF({
