@@ -97,27 +97,22 @@
 </template>
 <script>
 export default (props, { $, $store, $on, $f7, $f7router }) => {
+    const url = $store.getters.url.value;
 
     $on('pageInit', () => {
 
         $('#formAddUser').on('submit', function () {
             var formData = $f7.form.convertToData('#formAddUser');
 
-            let users = $f7.store.state.users;
-            let cek = users.find(obj => {
-                return obj.username === formData.username;
-            })
-            if ( cek ) {
-                $f7.dialog.alert(`Maaf username "${formData.username}" sudah digunakan, silahkan masukan username lain`);
-            } else {
-                formData.id_user = (users.length+1).toString(); 
-                formData.registered = false; 
-                // store user
-                $store.dispatch('addUser', formData);
-
-                $f7.dialog.alert('Data User berhasil ditambahkan');
-                $f7router.back({force  : true});
-            }
+            $f7.request.post(`${url}/users`, formData)
+            .then(function (res) {
+                if ( status === 201 ) {
+                    $f7.dialog.alert('Data User baru berhasil ditambahkan');
+                    $f7router.back({force  : true});
+                } else {
+                    $f7.dialog.alert('Data User Gagal ditambahkan');
+                }
+            });
         });
         
     });

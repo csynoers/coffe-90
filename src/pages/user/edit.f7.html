@@ -85,8 +85,6 @@
                             <div class="item-content item-input">
                                 <div class="item-inner">
                                     <div class="item-input-wrap">
-                                        <input type="hidden" name="id_user" />
-                                        <input type="hidden" name="registered" />
                                         <button type="submit" class="col button button-small button-fill">Simpan</button>
                                     </div>
                                 </div>
@@ -100,34 +98,68 @@
 </template>
 <script>
 export default (props, { $, $store, $on, $f7, $f7route, $f7router }) => {
+    const url = $store.getters.url.value;
+
     $on('pageInit', () => {
+        // get data
         let get = $f7route.params;
-        let users = $store.getters.users;
-        
-        let row = users.value.find(obj => {
-            return obj.id_user === get.userId; 
-        })
-
-        console.log(users)
-
-        let formData = {
-            'username': row.username,
-            'nama': row.nama,
-            'level': row.level,
-            'status': row.status,
-            'password': row.password,
-            'id_user': row.id_user,
-            'registered': row.registered,
-        }
-        $f7.form.fillFromData('#formEditUser', formData);
+        $f7.request.get(`${url}/users/${get.userId}`)
+        .then(function (res) {
+            if ( res.status === 200 ) {
+                let json = JSON.parse(res.data);
+                let formData = {
+                    'username': json.username,
+                    'nama': json.nama,
+                    'level': json.level,
+                    'status': json.status,
+                    'password': json.password,
+                }
+                $f7.form.fillFromData('#formEditUser', formData);   
+            }
+        });
 
         $('#formEditUser').on('submit', function () {
             let formData = $f7.form.convertToData('#formEditUser');
             // update user
-            $store.dispatch('updateUser', formData);
-
-            $f7.dialog.alert('Data User berhasil diubah');
-            $f7router.back({force  : true});
+            $f7.request({
+                url: `${url}/users/${get.userId}`,
+                dataType: 'json',
+                method: 'PUT',
+                data: formData, 
+                statusCode: {
+                    404: function (xhr) {
+                        console.log("URL not found");
+                    },
+                    400: function (xhr) {
+                        console.log("Bad request. Some of the inputs provided to the request aren't valid.");
+                    },
+                    401: function (xhr) {
+                        console.log("Not authenticated. The user session isn't valid.");
+                    },
+                    403: function (xhr) {
+                        console.log("The user isn't authorized to perform the specified request.");
+                    },
+                    500: function (xhr) {
+                        console.log("Internal server error. Additional details will be contained on the server logs.");
+                    },
+                    201: function (xhr) {
+                        console.log("The requested resource has been created.");
+                    }
+                },
+                success: function (data, status, xhr) {
+                    console.log(data)
+                    if ( status == 200 ) {
+                        $f7.dialog.alert('Data User berhasil diubah');
+                        $f7router.back({force  : true});
+                    }
+                },
+                error: function (xhr, status) {
+                    console.log(xhr);
+                    console.log(JSON.stringify(xhr));
+                    console.log(status);
+                }
+            });
+            
         });
 
     });
