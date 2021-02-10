@@ -36,7 +36,7 @@ var routes = [
   // },
   {
     path: '/',
-    component: LaporanPenjualanPage,
+    component: HomeOwnerPage,
   },
   {
     path: '/login/',

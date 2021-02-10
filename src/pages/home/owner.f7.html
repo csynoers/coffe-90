@@ -37,11 +37,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${menu_favorit.map((Mitem,Mindex)=>$h`
+                            ${laporan_menu_favorit.value.map((Mitem,Mindex)=>$h`
                                 <tr>
                                     <td class="numeric-cell">${Mindex+1}</td>
                                     <td class="label-cell">${Mitem.nama_menu}</td>
-                                    <td class="label-cell">${Mitem.terjual}</td>
+                                    <td class="label-cell">${Mitem.jumlah_terjual===null? 0 : Mitem.jumlah_terjual }</td>
                                 </tr>
                             `)}
                         </tbody>
@@ -66,25 +66,14 @@
     </div>
 </template>
 <script>
-export default (props,{ $f7, $store, $f7route, $f7router, $update, $onMounted }) => {
-    let menu = $store.getters.menu;
+export default (props,{ $f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+    let laporan_menu_favorit = $store.getters.laporan_menu_favorit;
     
-    let getTerjual = function(id_menu){
-        let terjualArray = 0;
-        $store.getters.pesanan_detail.value.forEach((item) => {
-            if ( item.id_menu == id_menu ) {
-                terjualArray = terjualArray+item.jumlah;
-            }
-        });
-        return terjualArray;
-    }
-
-    let menu_favorit = [];
-    menu.value.forEach((item,index) => {
-        menu_favorit.push(item);
-        menu_favorit[index].terjual = getTerjual(item.id_menu);
+    $on('pageInit', (e) => {
+        // get laporan menu favorit
+        $store.dispatch('getLaporanMenuFavorit');
     });
-    menu_favorit.sort((a, b) => (a.terjual < b.terjual) ? 1 : -1)
+
     return $render;
 }
 </script>

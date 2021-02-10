@@ -122,7 +122,7 @@ export default (props,{ $,$f7, $store, $f7route, $f7router, $update, $on, $onMou
                 success: function (data, status, xhr) {
                     console.log(data)
                     if ( status == 200 ) {
-                        $f7.dialog.alert('Data Menu berhasil diubah');
+                        $f7.dialog.alert('Menu berhasil diambil');
                         $f7router.navigate('/daftar-antrian/',{reloadCurrent  : true});
                     }
                 },
