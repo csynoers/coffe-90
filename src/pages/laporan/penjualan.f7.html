@@ -137,7 +137,7 @@ export default (props,{ $, $f7, $store, $f7route,$f7ready, $f7router, $update, $
             
             var generateData = function() {
                 var result = [];
-                laporan_penjualan.forEach((item,index)=>{
+                laporan_penjualan.value.forEach((item,index)=>{
                     result.push(`
                         <tr>
                             <td>${index + 1}</td>

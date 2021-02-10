@@ -71,6 +71,7 @@ const store = createStore({
       },
     ],
     laporan_penjualan: [],
+    laporan_penjualan_filter: [],
     laporan_stok: [],
     kategori: [],
     menu: [],
@@ -143,6 +144,9 @@ const store = createStore({
     laporan_penjualan({ state }) {
       return state.laporan_penjualan;
     },
+    laporan_penjualan_filter({ state }) {
+      return state.laporan_penjualan_filter;
+    },
     laporan_stok({ state }) {
       return state.laporan_stok;
     },
@@ -191,6 +195,13 @@ const store = createStore({
         .then((res) => res.json())
         .then((laporan_penjualan) => {
           state.laporan_penjualan = laporan_penjualan;
+        })
+    },
+    getLaporanPenjualanFilter({ state }, periode) {
+      fetch(`${state.url}/laporan/penjualan-filter?start=${periode.start}&end=${periode.end}`)
+        .then((res) => res.json())
+        .then((laporan_penjualan_filter) => {
+          state.laporan_penjualan_filter = laporan_penjualan_filter;
         })
     },
     getLaporanStok({ state }) {
