@@ -56,17 +56,14 @@
         </div>
     </div>
 </template>
-<style>
-    table tbody tr td {
-        padding: 3px 10px;
-        width: 1px;
-        white-space: nowrap;
-    }
-
-</style>
 <script>
 export default (props, { $store, $on }) => {
     const users = $store.getters.users;
+
+    $on('pageInit', (e) => {
+        // get data users
+        $store.dispatch('getUsers');
+    });
 
     return $render;
 }

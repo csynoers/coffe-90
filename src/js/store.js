@@ -3,56 +3,10 @@ import { createStore } from 'framework7';
 
 const store = createStore({
   state: {
-    url: 'http://localhost:8081',
+    // url: 'http://localhost:8081',
     // level: 0,
-    // url: 'https://restapp.site.co.id',
-    users: [
-      {
-        id_user:'1',
-        username: 'owner',
-        password: 'owner',
-        nama: 'Cakrabirawa Santoso',
-        level: 'Owner',
-        status: 'Aktif',
-        registered: false
-      },
-      {
-        id_user:'2',
-        username: 'admin@satu',
-        password: 'admin@satu',
-        nama: 'Gina Cindy Usamah',
-        level: 'Admin',
-        status: 'Aktif',
-        registered: false
-      },
-      {
-        id_user:'3',
-        username: 'admin@dua',
-        password: 'admin@dua',
-        nama: 'Farhunnisa Fujiati',
-        level: 'Admin',
-        status: 'Tidak Aktif',
-        registered: false
-      },
-      {
-        id_user:'4',
-        username: 'dapur@satu',
-        password: 'dapur@satu',
-        nama: 'Galang Najmudin',
-        level: 'Dapur',
-        status: 'Aktif',
-        registered: false
-      },
-      {
-        id_user:'5',
-        username: 'dapur@dua',
-        password: 'dapur@dua',
-        nama: 'Salman Pradipta',
-        level: 'Dapur',
-        status: 'Tidak Aktif',
-        registered: false
-      },
-    ],
+    url: 'https://restapp.site.co.id',
+    users: [],
     laporan_penjualan: [],
     laporan_penjualan_filter: [],
     laporan_stok: [],
@@ -122,6 +76,13 @@ const store = createStore({
     },
   },
   actions: {
+    getUsers({ state }) {
+      fetch(`${state.url}/users`)
+        .then((res) => res.json())
+        .then((users) => {
+          state.users = users;
+        })
+    },
     getLaporanPenjualan({ state }) {
       fetch(`${state.url}/laporan/penjualan`)
         .then((res) => res.json())
