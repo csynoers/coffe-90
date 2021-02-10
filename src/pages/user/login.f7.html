@@ -40,7 +40,8 @@
     </div>
 </template>
 <script>
-    export default (props,{ $f7, $store, $f7route, $f7router, $update, $onMounted }) => {
+    export default (props,{ $f7, $store, $f7route, $f7router, $update, $on, $onMounted }) => {
+        const url = $store.getters.url.value;
         const $ = $f7.$;
 
         // Login screen data
@@ -56,10 +57,47 @@
             $update();
         }
         
-        $onMounted(() => {
+        $on('pageInit', () => {
             $('#formLogin').on('submit',function(e){
                 var formData = $f7.form.convertToData(this);
-                $f7router.navigate('/home-admin/')
+
+                $f7.request.get(`${url}/users`,formData)
+                .then(function (res) {
+                    if ( res.status === 200 ) {
+                        let json = JSON.parse(res.data);
+                        if ( json.length > 0 ) {
+                            if ( json[0].status == 'Aktif' ) {
+                                // get data users
+                                $store.dispatch('updateUserLogin',json[0]);
+                                $store.dispatch('updateLevel',json[0].level);
+                                // $f7router.navigate('/home-owner/');
+                                
+                                switch ( json[0].level ) {
+                                    case 'Owner':
+                                        $f7router.navigate('/home-owner/');
+                                        break;
+                                    case 'Admin':
+                                        $f7router.navigate('/home-admin/');
+                                        break;
+                                    case 'Dapur':
+                                        $f7router.navigate('/home-dapur/');
+                                        break;
+                                
+                                    default:
+                                        break;
+                                }
+                            } else {
+                                $f7.dialog.alert('Maaf User tidak ditemukan');
+                            }
+
+                        } else {
+                            $f7.dialog.alert('Maaf User tidak ditemukan');
+                        }
+                        
+                        // $f7.form.fillFromData('#formEditUser', formData);   
+                    }
+                });
+                // $f7router.navigate('/home-admin/')
 
                 // let users = $f7.store.state.users;
                 // users.forEach((item,index) => {
@@ -79,15 +117,15 @@
                 //     switch (role) {
                 //         case 'Owner':
                 //             $store.dispatch('updateLevel','Owner');
-                //             $f7router.navigate('/home-owner/');
+                //             
                 //             break;
                 //         case 'Admin':
                 //             $store.dispatch('updateLevel','Admin');
-                //             $f7router.navigate('/home-admin/');
+                //             
                 //             break;
                 //         case 'Dapur':
                 //             $store.dispatch('updateLevel','Dapur');
-                //             $f7router.navigate('/home-dapur/');
+                //             
                 //             break;
                             
                 //         default:

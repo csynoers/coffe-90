@@ -3,10 +3,10 @@ import { createStore } from 'framework7';
 
 const store = createStore({
   state: {
-    // url: 'http://localhost:8081',
-    // level: 0,
+    level: 0,
     url: 'https://restapp.site.co.id',
     users: [],
+    user_login: [],
     laporan_penjualan: [],
     laporan_penjualan_filter: [],
     laporan_stok: [],
@@ -30,6 +30,9 @@ const store = createStore({
     },
     users({ state }) {
       return state.users;
+    },
+    user_login({ state }) {
+      return state.user_login;
     },
     laporan_penjualan({ state }) {
       return state.laporan_penjualan;
@@ -155,6 +158,9 @@ const store = createStore({
     },
     addCart({ state }, cart) {
       state.cart = [...state.cart, cart];
+    },
+    updateUserLogin({ state }, user_login) {
+      state.user_login = user_login;
     },
     updateLevel({ state }, level) {
       state.level = level;
